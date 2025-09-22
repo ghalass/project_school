@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { config } from "../config/environment.js";
 
 /**
  * Calcul le nombre des jours dans un mois à partir d'une date
@@ -50,13 +51,13 @@ export const hidePassword = (user) => {
 /**
  * Génère un token JWT pour un utilisateur
  * @param {object} loggedUser - Données de l'utilisateur à stocker dans le token
- * @param {string} [secret=process.env.ACCESS_TOKEN_SECRET] - Clé secrète pour signer le token
+ * @param {string} [secret=config.ACCESS_TOKEN_SECRET] - Clé secrète pour signer le token
  * @param {string|number} [expiresIn="7h"] - Durée d'expiration du token (ex: "7h", "1d", 3600)
  * @returns {string} - Token JWT signé
  */
 export const generateToken = (
   loggedUser,
-  secret = process.env.ACCESS_TOKEN_SECRET,
+  secret = config.ACCESS_TOKEN_SECRET,
   expiresIn = "7h"
 ) => {
   if (!secret) {
@@ -81,7 +82,7 @@ export const generateToken = (
 export const setAuthCookie = (res, token, maxAge) => {
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: config.NODE_ENV === "production",
     sameSite: "None",
     maxAge,
   });

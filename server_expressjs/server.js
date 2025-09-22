@@ -20,9 +20,6 @@ requiredEnv.forEach((key) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
-const HOST = process.env.URL || "http://localhost";
-
 // Routes
 import userRoutes from "./routes/user.js";
 import authRoutes from "./routes/auth.js";
@@ -31,6 +28,7 @@ import rootRoutes from "./routes/root.js";
 // Pour __dirname en ESM :
 import { fileURLToPath } from "url";
 import { logger } from "./middleware/logger.js";
+import { config } from "./config/environment.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -88,8 +86,10 @@ app.use((err, req, res, next) => {
 async function startServer() {
   try {
     await prisma.$connect();
-    app.listen(PORT, () => {
-      console.log(`✅ Connected to DB & listening on ${HOST}:${PORT}`);
+    app.listen(config.PORT, () => {
+      console.log(
+        `✅ Connected to DB & listening on ${config.HOST}:${config.PORT}`
+      );
     });
   } catch (err) {
     console.error("Failed to connect to DB:", err);

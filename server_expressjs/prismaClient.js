@@ -1,10 +1,11 @@
 // prismaClient.js
 
 import { PrismaClient } from "@prisma/client";
+import { config } from "./config/environment.js";
 
 let prisma;
 
-if (process.env.NODE_ENV === "production") {
+if (config.NODE_ENV === "production") {
   // En production, nous évitons de recréer l'instance pour chaque requête
   prisma = new PrismaClient();
 } else {
