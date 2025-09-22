@@ -10,15 +10,12 @@ import prisma from "../utils/prismaClient.js";
  */
 export const getByEmail = async (req, res) => {
   const { email } = req.body;
-  const user = await prisma.user.findFirst({
-    where: { email },
-    select: { id: true, name: true, email: true, role: true, active: true },
-  });
+  const user = await prisma.user.findFirst({ where: { email } });
 
   if (!user) {
     return res.status(400).json({ error: "Utilisateur non trouvé." });
   }
-  res.status(200).json(user);
+  res.status(200).json(hidePassword(user));
 };
 
 /**
@@ -51,10 +48,9 @@ export const changePassword = async (req, res) => {
   const updatedUser = await prisma.user.update({
     where: { email },
     data: { password: hashedPassword },
-    select: { id: true, name: true, email: true, role: true, active: true },
   });
 
-  res.status(200).json(updatedUser);
+  res.status(200).json(hidePassword(updatedUser));
 };
 
 /**
@@ -116,10 +112,8 @@ export const updateUser = async (req, res) => {
   const updatedUser = await prisma.user.update({
     where: { id: parseInt(id) },
     data,
-    select: { id: true, name: true, email: true, role: true, active: true },
   });
-
-  res.status(HttpStatus.OK).json(updatedUser);
+  res.status(HttpStatus.OK).json(hidePassword(updatedUser));
 };
 
 /**
