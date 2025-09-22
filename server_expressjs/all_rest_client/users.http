@@ -1,0 +1,50 @@
+@baseUrl =http://localhost:4000/user
+@superAdminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsIm5hbWUiOiJnaGFsYXNzIiwiZW1haWwiOiJnaGFsYXNzQGdtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1ODU0MjgzOCwiZXhwIjoxNzU4NTY4MDM4fQ.Dfq_LgKmtCCHMSGMvjwxThFfL_zJ4-sbULokvTxIduQ
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsIm5hbWUiOiJhbGkiLCJlbWFpbCI6ImFsaUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NTg1MzEwMDMsImV4cCI6MTc1ODU1NjIwM30.fm-WzxvpwlQmn3XFG2FzGgTibOm3iTeql6O6-cHfLL0
+@userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsIm5hbWUiOiJhbGkiLCJlbWFpbCI6ImFsaUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1ODUyNzE4OCwiZXhwIjoxNzU4NTUyMzg4fQ.Igzcrn27ys9s0gvIFtTIMom29EHJ_QBfk6eHJULnI7M
+
+### CREATE SUPER_ADMIN
+GET {{baseUrl}}/create_super_admin
+
+### CREATE USER (REQUIRE ADMIN OR SUPER_ADMIN)
+POST {{baseUrl}}/signup
+Content-Type: application/json
+Cookie: jwt={{superAdminToken}};
+
+{
+    "name":"salka",
+    "email":"salka@gmail.com",
+    "password":"123456"
+}
+
+### GET ALL USERS (REQUIRE AUTH)
+GET {{baseUrl}}/users
+Cookie: jwt={{superAdminToken}};
+
+### DELETE USER (REQUIRE ADMIN OR SUPER_ADMIN)
+DELETE  {{baseUrl}}/6
+Cookie: jwt={{superAdminToken}};
+
+### GET USER BY EMAIL (REQUIRE AUTH)
+POST {{baseUrl}}/getByEmail
+Cookie: jwt={{userToken}};
+Content-Type: application/json
+
+{
+    "email":"ghalass@gmail.com"
+}
+
+### UPDATE USER (ADMIN OR SUPER_ADMIN)
+PATCH  {{baseUrl}}/updateUser
+Cookie: jwt={{adminToken}};
+Content-Type: application/json
+
+{
+    "id":10,
+    "name":"barhim",
+    "email":"brahim@gmail.com"
+}
+
+### TEST 404
+GET {{baseUrl}}/test
+Cookie: jwt={{superAdminToken}};

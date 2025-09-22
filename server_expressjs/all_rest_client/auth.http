@@ -1,0 +1,24 @@
+@baseUrl =http://localhost:4000/auth
+@superAdminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsIm5hbWUiOiJnaGFsYXNzIiwiZW1haWwiOiJnaGFsYXNzQGdtYWlsLmNvbSIsInJvbGUiOiJTVVBFUl9BRE1JTiIsImlhdCI6MTc1ODUzOTU1NiwiZXhwIjoxNzU4NTY0NzU2fQ.OzUK0jZV_FJHWRdIygf57fyiRfpUNnyp1qQ1-Tna94E
+@adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsIm5hbWUiOiJhbGkiLCJlbWFpbCI6ImFsaUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3NTg1MzEwMDMsImV4cCI6MTc1ODU1NjIwM30.fm-WzxvpwlQmn3XFG2FzGgTibOm3iTeql6O6-cHfLL0
+@userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsIm5hbWUiOiJhbGkiLCJlbWFpbCI6ImFsaUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1ODUyNzE4OCwiZXhwIjoxNzU4NTUyMzg4fQ.Igzcrn27ys9s0gvIFtTIMom29EHJ_QBfk6eHJULnI7M
+
+### LOGIN
+POST {{baseUrl}}/login
+Content-Type: application/json
+
+{
+    "email":"ghalass@gmail.com",
+    "password":"gh@l@ss@dmin"
+}
+
+### CREATE USER (REQUIRE ADMIN OR SUPER_ADMIN)
+POST {{baseUrl}}/signup
+Content-Type: application/json
+Cookie: jwt={{superAdminToken}};
+
+{
+    "name":"aaa",
+    "email":"aaa@gmail.com",
+    "password":"123456"
+}
