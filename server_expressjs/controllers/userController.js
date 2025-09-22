@@ -1,9 +1,9 @@
 import "dotenv/config";
-import prisma from "../prismaClient.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { hashPassword, hidePassword } from "../utils/functions.js";
 import HttpStatus from "../utils/httpStatus.js";
+import prisma from "../utils/prismaClient.js";
 
 /**
  * Récupérer un utilisateur par email

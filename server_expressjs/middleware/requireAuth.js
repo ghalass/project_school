@@ -1,7 +1,7 @@
 // middleware/requireAuth.js
 
-import prisma from "../prismaClient.js";
 import jwt from "jsonwebtoken";
+import prisma from "../utils/prismaClient.js";
 
 const requireAuth = async (req, res, next) => {
   const sendError = (status, message) =>

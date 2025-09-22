@@ -1,4 +1,3 @@
-import prisma from "../prismaClient.js";
 import {
   hashPassword,
   hidePassword,
@@ -7,6 +6,7 @@ import {
   setAuthCookie,
 } from "../utils/functions.js";
 import HttpStatus from "../utils/httpStatus.js";
+import prisma from "../utils/prismaClient.js";
 
 // Durée d'expiration du token (7h en millisecondes)
 const tokenExpireIn = 7 * 60 * 60 * 1000;

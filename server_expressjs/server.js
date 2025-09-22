@@ -9,7 +9,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import corsOptions from "./config/corsOptions.js";
-import prisma from "./prismaClient.js";
+import prisma from "./utils/prismaClient.js";
 
 // .ENV VARIABLES ==> CHECK ALL VARIABLES
 const requiredEnv = ["ACCESS_TOKEN_SECRET", "URL", "DATABASE_URL", "PORT"];
