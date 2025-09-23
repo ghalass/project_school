@@ -46,12 +46,10 @@ export function useDeleteUserMutation() {
     },
     onError: (_err, _user, context) => {
       queryClient.setQueryData(['usersList'], context.previousUsers)
+      console.error('DELETE_USER failed:', error.message)
     },
     onSettled: () => {
       invalidateUsersList(queryClient)
-    },
-    onError: (error) => {
-      console.error('DELETE_USER failed:', error.message)
     },
   })
 }

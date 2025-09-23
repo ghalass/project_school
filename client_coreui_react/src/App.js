@@ -57,9 +57,9 @@ const App = () => {
           <Route path="/" element={<Home />} />
 
           {/* Routes protégées */}
-          <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
-            <Route path="*" element={<DefaultLayout />} />
-          </Route>
+          {/* <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}> */}
+          <Route path="*" element={<DefaultLayout />} />
+          {/* </Route> */}
         </Routes>
       </Suspense>
     </HashRouter>
