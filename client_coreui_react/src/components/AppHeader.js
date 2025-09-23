@@ -13,10 +13,12 @@ import {
   CNavLink,
   CNavItem,
   useColorModes,
+  CBadge,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {
   cilBell,
+  cilChatBubble,
   cilContrast,
   cilEnvelopeOpen,
   cilList,
@@ -27,6 +29,7 @@ import {
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
+import { useAuth } from '../context/AuthContext'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -42,6 +45,8 @@ const AppHeader = () => {
     })
   }, [])
 
+  const { user } = useAuth()
+
   return (
     <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
       <CContainer className="border-bottom px-4" fluid>
@@ -51,10 +56,12 @@ const AppHeader = () => {
         >
           <CIcon icon={cilMenu} size="lg" />
         </CHeaderToggler>
-        <CHeaderNav className="d-none d-md-flex">
+
+        {/*  */}
+        <CHeaderNav className="d-none d-md-flex me-auto">
           <CNavItem>
-            <CNavLink to="/dashboard" as={NavLink}>
-              Dashboard
+            <CNavLink to="/" as={NavLink}>
+              Home
             </CNavLink>
           </CNavItem>
           <CNavItem>
@@ -62,31 +69,20 @@ const AppHeader = () => {
               Users
             </CNavLink>
           </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">Settings</CNavLink>
-          </CNavItem>
         </CHeaderNav>
-        <CHeaderNav className="ms-auto">
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilBell} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-            </CNavLink>
-          </CNavItem>
-        </CHeaderNav>
+
+        {/*  */}
+
         <CHeaderNav>
+          <CNavItem>
+            <CNavLink to="/chat" as={NavLink} className="text-success">
+              <CIcon icon={cilChatBubble} size="lg" /> Chat
+            </CNavLink>
+          </CNavItem>
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
           </li>
+          {/*  */}
           <CDropdown variant="nav-item" placement="bottom-end">
             <CDropdownToggle caret={false}>
               {colorMode === 'dark' ? (
@@ -130,9 +126,33 @@ const AppHeader = () => {
           <li className="nav-item py-1">
             <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
           </li>
+
+          {/*  */}
+          <div className="d-none d-md-flex">
+            <div className="d-block align-content-center ">
+              <div className="d-flex align-content-center gap-1">
+                <CBadge textBgColor="light" shape="rounded-pill">
+                  <span className="text-uppercase">
+                    {user?.name} {user?.lastName}
+                  </span>
+                </CBadge>
+
+                <CBadge color="info" shape="rounded-pill">
+                  <span className="text-uppercase">{user?.role}</span>
+                </CBadge>
+              </div>
+            </div>
+            <li className="nav-item py-1">
+              <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
+            </li>
+          </div>
+
+          {/*  */}
           <AppHeaderDropdown />
         </CHeaderNav>
       </CContainer>
+
+      {/*  */}
       <CContainer className="px-4" fluid>
         <AppBreadcrumb />
       </CContainer>

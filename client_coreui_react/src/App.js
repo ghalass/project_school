@@ -47,11 +47,7 @@ const App = () => {
       >
         <Routes>
           {/* Routes publiques */}
-          <Route
-            path="/login"
-            element={isAuthenticated ? <Navigate to="/dashboard" /> : <Login />}
-          />
-          <Route path="/" element={<Home />} />
+          <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login />} />
 
           {/* Routes protégées */}
           <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} loading={loading} />}>

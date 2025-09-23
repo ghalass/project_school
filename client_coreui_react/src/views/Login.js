@@ -16,10 +16,10 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import { useLoginMutation } from '../../../hooks/useUsers'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
-import { useAuthContext } from '../../../context/AuthContext'
+import { useLoginMutation } from '../hooks/useUsers'
+import { useAuthContext } from '../context/AuthContext'
 
 const Login = () => {
   const initialVal = { email: 'ali@gmail.com', password: '123456' }
