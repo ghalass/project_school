@@ -1,9 +1,9 @@
 {
   "name": "SCHOOL APP",
-  "version": "5.5.0",
+  "version": "1.0.0",
   "description": "SCHOOL APP",
   "homepage": ".",
-  "license": "MIT",
+  "license": "PRIVATE",
   "author": "GHALASS",
   "scripts": {
     "build": "vite build",
