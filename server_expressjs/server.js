@@ -51,17 +51,17 @@ app.use(
       },
     },
     crossOriginEmbedderPolicy: false,
-    crossOriginResourcePolicy: { policy: "same-origin" },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
 app.use("/", express.static(path.join(__dirname, "public"))); // static files
+
+app.use(logger);
 
 // USE ROUTES
 app.use("/", rootRoutes);
 app.use("/user", userRoutes);
 app.use("/auth", authRoutes);
-
-app.use(logger);
 
 // 404 ROUTE
 app.all("*", (req, res) => {

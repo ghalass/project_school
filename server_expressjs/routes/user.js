@@ -27,27 +27,27 @@ const router = express.Router();
 router.get("/create_super_admin", asyncHandler(createSuperAdmin));
 
 /*************************** REQUIRE AUTH FOR ALL ROUTES BELOW ***************************/
-router.use(requireAuth);
 
 // GET ALL USERS
-router.get("/users", asyncHandler(getUsers));
+router.get("/users", [requireAuth, asyncHandler(getUsers)]);
 
 // get user by email
-router.post(
-  "/getByEmail",
+router.post("/getByEmail", [
+  requireAuth,
   validate(getByEmailValidatorSchema),
-  asyncHandler(getByEmail)
-);
+  asyncHandler(getByEmail),
+]);
 
 // change user password
-router.post(
-  "/changePassword",
+router.post("/changePassword", [
+  requireAuth,
   validate(changePasswordValidatorSchema),
-  asyncHandler(changePassword)
-);
+  asyncHandler(changePassword),
+]);
 
 // UPDATE A USER
 router.patch("/updateUser", [
+  requireAuth,
   validate(updateUserValidatorSchema),
   allowedRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN]),
   asyncHandler(updateUser),
@@ -55,6 +55,7 @@ router.patch("/updateUser", [
 
 // DELETE A USER
 router.delete("/:id", [
+  requireAuth,
   allowedRoles([ROLES.SUPER_ADMIN, ROLES.ADMIN]),
   asyncHandler(deleteUser),
 ]);

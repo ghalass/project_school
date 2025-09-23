@@ -19,7 +19,7 @@ Cookie: jwt={{superAdminToken}};
 
 ### GET ALL USERS (REQUIRE AUTH)
 GET {{baseUrl}}/users
-Cookie: jwt={{superAdminToken}};
+# Cookie: jwt={{superAdminToken}};
 
 ### DELETE USER (REQUIRE ADMIN OR SUPER_ADMIN)
 DELETE  {{baseUrl}}/6

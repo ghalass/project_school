@@ -4,6 +4,7 @@ import {
   generateToken,
   comparePassword,
   setAuthCookie,
+  clearAuthCookie,
 } from "../utils/functions.js";
 import HttpStatus from "../utils/httpStatus.js";
 import prisma from "../utils/prismaClient.js";
@@ -11,9 +12,6 @@ import prisma from "../utils/prismaClient.js";
 // Durée d'expiration du token (7h en millisecondes)
 const tokenExpireIn = 7 * 60 * 60 * 1000;
 
-/**
- * Création d'un utilisateur
- */
 export const signupUser = async (req, res) => {
   const { name, email, password } = req.body;
   const msgEmailUsed = "E-mail déjà utilisé.";
@@ -27,35 +25,25 @@ export const signupUser = async (req, res) => {
   res.status(HttpStatus.CREATED).json(hidePassword(createdUser));
 };
 
-/**
- * Connexion d'un utilisateur
- */
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
   const msgIncorrect = "E-mail ou mot de passe incorrect.";
   const msgInactive =
     "Votre compte est désactivé, veuillez contacter un admin.";
   const user = await prisma.user.findFirst({ where: { email } });
-  if (!user) {
+  if (!user)
     return res.status(HttpStatus.BAD_REQUEST).json({ error: msgIncorrect });
-  }
   const passwordMatch = await comparePassword(password, user.password);
-  if (!passwordMatch) {
+  if (!passwordMatch)
     return res.status(HttpStatus.BAD_REQUEST).json({ error: msgIncorrect });
-  }
-  if (!user.active) {
+  if (!user.active)
     return res.status(HttpStatus.FORBIDDEN).json({ error: msgInactive });
-  }
   const token = generateToken(hidePassword(user));
   setAuthCookie(res, token, tokenExpireIn);
-
   res.status(HttpStatus.OK).json({ user: hidePassword(user), token });
 };
 
-/**
- * Déconnexion d'un utilisateur
- */
 export const logoutUser = async (req, res) => {
-  res.clearCookie("jwt");
+  clearAuthCookie(res, tokenExpireIn);
   res.status(HttpStatus.OK).json({ message: "Déconnecté avec succès." });
 };
