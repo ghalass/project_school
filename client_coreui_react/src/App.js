@@ -8,16 +8,13 @@ import './scss/style.scss'
 // We use those styles to show code examples, you should remove them in your application.
 import './scss/examples.scss'
 import { useAuth } from './context/AuthContext'
-import Home from './views/dashboard/Home'
+import Home from './views/Home'
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
 
 // Pages
-const Login = React.lazy(() => import('./views/pages/login/Login'))
-const Register = React.lazy(() => import('./views/pages/register/Register'))
-const Page404 = React.lazy(() => import('./views/pages/page404/Page404'))
-const Page500 = React.lazy(() => import('./views/pages/page500/Page500'))
+const Login = React.lazy(() => import('./views//Login'))
 
 const App = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
@@ -60,9 +57,6 @@ const App = () => {
           <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} loading={loading} />}>
             <Route path="*" element={<DefaultLayout />} />
           </Route>
-          {/* <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
-            <Route path="*" element={<DefaultLayout />} />
-          </Route> */}
         </Routes>
       </Suspense>
     </HashRouter>
@@ -84,12 +78,5 @@ const ProtectedRoute = ({ isAuthenticated, loading, redirectPath = '/login' }) =
 
   return <Outlet />
 }
-
-// const ProtectedRoute = ({ isAuthenticated, redirectPath = '/login' }) => {
-//   if (!isAuthenticated) {
-//     return <Navigate to={redirectPath} replace />
-//   }
-//   return <Outlet />
-// }
 
 export default App
