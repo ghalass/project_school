@@ -1,7 +1,6 @@
 import { cilCloudDownload, cilPlus } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { CBadge, CButton, CPagination, CPaginationItem, CSpinner } from '@coreui/react'
-import React from 'react'
 import { exportExcel, getMultiplesOf } from '../../utils/func'
 
 const TableHead = ({

@@ -8,13 +8,13 @@ import './scss/style.scss'
 // We use those styles to show code examples, you should remove them in your application.
 import './scss/examples.scss'
 import { useAuth } from './context/AuthContext'
-import Home from './views/Home'
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
 
 // Pages
-const Login = React.lazy(() => import('./views//Login'))
+const Login = React.lazy(() => import('./views/Login'))
+const Home = React.lazy(() => import('./views/Home'))
 
 const App = () => {
   const { isColorModeSet, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')

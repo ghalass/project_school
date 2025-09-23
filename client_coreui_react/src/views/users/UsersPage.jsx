@@ -1,7 +1,6 @@
 import CIcon from '@coreui/icons-react'
 import {
   CAlert,
-  CBadge,
   CButton,
   CFormCheck,
   CFormInput,
@@ -11,8 +10,6 @@ import {
   CModalFooter,
   CModalHeader,
   CModalTitle,
-  CPagination,
-  CPaginationItem,
   CSpinner,
   CTable,
   CTableBody,
@@ -21,16 +18,15 @@ import {
   CTableHeaderCell,
   CTableRow,
 } from '@coreui/react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
   useCreateUserMutation,
   useDeleteUserMutation,
   fecthUsersQuery,
   useUpdateUserMutation,
 } from '../../hooks/useUsers'
-import { exportExcel, getMultiplesOf } from '../../utils/func'
 import { useQuery } from '@tanstack/react-query'
-import { cilCloudDownload, cilPenNib, cilPlus, cilTrash } from '@coreui/icons'
+import { cilPenNib, cilTrash } from '@coreui/icons'
 import { USER_TYPE } from '../../utils/types'
 import TableHead from './TableHead'
 import { toast } from 'react-toastify'

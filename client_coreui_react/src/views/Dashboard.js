@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { useAuth, useAuthContext } from '../../context/AuthContext'
-import { useLogoutMutation } from '../../hooks/useUsers'
+import { useLogoutMutation } from '../hooks/useUsers'
 import { toast } from 'react-toastify'
 import { CButton } from '@coreui/react'
+import { useAuth, useAuthContext } from '../context/AuthContext'
 
 const Dashboard = () => {
   const { user } = useAuth()
