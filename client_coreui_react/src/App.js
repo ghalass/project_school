@@ -37,7 +37,7 @@ const App = () => {
     setColorMode(storedTheme)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, loading } = useAuth()
 
   return (
     <HashRouter>
@@ -57,20 +57,39 @@ const App = () => {
           <Route path="/" element={<Home />} />
 
           {/* Routes protégées */}
-          {/* <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}> */}
-          <Route path="*" element={<DefaultLayout />} />
-          {/* </Route> */}
+          <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} loading={loading} />}>
+            <Route path="*" element={<DefaultLayout />} />
+          </Route>
+          {/* <Route element={<ProtectedRoute isAuthenticated={isAuthenticated} />}>
+            <Route path="*" element={<DefaultLayout />} />
+          </Route> */}
         </Routes>
       </Suspense>
     </HashRouter>
   )
 }
 
-const ProtectedRoute = ({ isAuthenticated, redirectPath = '/login' }) => {
+const ProtectedRoute = ({ isAuthenticated, loading, redirectPath = '/login' }) => {
+  if (loading) {
+    return (
+      <div className="pt-3 text-center">
+        <CSpinner color="primary" variant="grow" />
+      </div>
+    )
+  }
+
   if (!isAuthenticated) {
     return <Navigate to={redirectPath} replace />
   }
+
   return <Outlet />
 }
+
+// const ProtectedRoute = ({ isAuthenticated, redirectPath = '/login' }) => {
+//   if (!isAuthenticated) {
+//     return <Navigate to={redirectPath} replace />
+//   }
+//   return <Outlet />
+// }
 
 export default App
