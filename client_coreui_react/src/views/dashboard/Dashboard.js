@@ -1,12 +1,12 @@
 import { useNavigate } from 'react-router-dom'
 import { useAuth, useAuthContext } from '../../context/AuthContext'
-import { logoutQuery } from '../../hooks/useUsers'
+import { useLogoutMutation } from '../../hooks/useUsers'
 import { toast } from 'react-toastify'
 import { CButton } from '@coreui/react'
 
 const Dashboard = () => {
   const { user } = useAuth()
-  const logoutMutation = logoutQuery()
+  const logoutMutation = useLogoutMutation()
   const navigate = useNavigate()
   const { dispatch } = useAuthContext()
   const onLogout = (e) => {

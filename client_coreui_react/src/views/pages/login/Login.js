@@ -16,14 +16,14 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
-import { loginQuery } from '../../../hooks/useUsers'
+import { useLoginMutation } from '../../../hooks/useUsers'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import { useAuthContext } from '../../../context/AuthContext'
 
 const Login = () => {
   const initialVal = { email: 'ali@gmail.com', password: '123456' }
-  const loginMutation = loginQuery()
+  const loginMutation = useLoginMutation()
   const [formData, setFormData] = useState(initialVal)
   const navigate = useNavigate()
   const { dispatch } = useAuthContext()

@@ -23,16 +23,17 @@ import {
 } from '@coreui/react'
 import React, { useState } from 'react'
 import {
-  createUserQuery,
-  deleteUserQuery,
+  useCreateUserMutation,
+  useDeleteUserMutation,
   fecthUsersQuery,
-  updateUserQuery,
+  useUpdateUserMutation,
 } from '../../hooks/useUsers'
 import { exportExcel, getMultiplesOf } from '../../utils/func'
 import { useQuery } from '@tanstack/react-query'
 import { cilCloudDownload, cilPenNib, cilPlus, cilTrash } from '@coreui/icons'
 import { USER_TYPE } from '../../utils/types'
 import TableHead from './TableHead'
+import { toast } from 'react-toastify'
 
 const UsersPage = () => {
   const getAllQuery = useQuery(fecthUsersQuery())
@@ -42,9 +43,9 @@ const UsersPage = () => {
   const initialVal = { id: '', name: '', email: '', password: '', active: true }
 
   const [entity, setEntity] = useState(initialVal)
-  const createMutation = createUserQuery()
-  const deleteMutation = deleteUserQuery()
-  const updateMutation = updateUserQuery()
+  const createMutation = useCreateUserMutation()
+  const deleteMutation = useDeleteUserMutation()
+  const updateMutation = useUpdateUserMutation()
 
   const handleSubmit = (e) => {
     e.preventDefault()
