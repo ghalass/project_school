@@ -29,11 +29,12 @@ export const apiRequest = async (endpoint, method = 'GET', body = null) => {
 
     return response.data
   } catch (error) {
-    const response = error.response
-    throw {
-      message:
-        response?.data?.error || error.message || 'Une erreur est survenue lors de la requête.',
-      status: response?.status,
-    }
+    // const response = error.response
+    // throw {
+    //   message:
+    //     response?.data?.error || error.message || 'Une erreur est survenue lors de la requête.',
+    //   status: response?.status,
+    // }
+    throw error
   }
 }

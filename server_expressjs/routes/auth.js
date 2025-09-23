@@ -29,7 +29,7 @@ router.post("/login", [
 router.post("/logout", asyncHandler(logoutUser));
 
 /**************** REQUIRE AUTH FOR ALL ROUTES BELOW ****************/
-// router.use(requireAuth);
+router.use(requireAuth);
 
 // CREATE A NEW USER ==> ONLY ADMIN & SUPER_ADMIN ARE ALLOWED
 router.post("/signup", [

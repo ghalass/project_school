@@ -26,7 +26,7 @@ import {
   useUpdateUserMutation,
 } from '../../hooks/useUsers'
 import { useQuery } from '@tanstack/react-query'
-import { cilPenNib, cilTrash } from '@coreui/icons'
+import { cilPenNib, cilToggleOff, cilToggleOn, cilTrash } from '@coreui/icons'
 import { USER_TYPE } from '../../utils/types'
 import TableHead from './TableHead'
 import { toast } from 'react-toastify'
@@ -87,6 +87,12 @@ const UsersPage = () => {
     }
   }
 
+  const errors =
+    createMutation.error?.response?.data?.errors ||
+    deleteMutation.error?.response?.data?.errors ||
+    updateMutation.error?.response?.data?.errors ||
+    {}
+
   const handleResetAll = () => {
     setEntity(initialVal)
     createMutation.reset()
@@ -124,6 +130,7 @@ const UsersPage = () => {
 
   return (
     <div>
+      <h6 className="text-danger"> TODO: vérifier update, probleme de validation des données</h6>
       <TableHead
         title="Liste des utilisateurs"
         getAllQuery={getAllQuery}
@@ -193,16 +200,18 @@ const UsersPage = () => {
                 <CTableDataCell>{item?.role?.replace('_', ' ')}</CTableDataCell>
                 <CTableDataCell>
                   {item?.active ? (
-                    <i className="bi bi-toggle2-on text-primary"></i>
+                    <CIcon icon={cilToggleOn} size="xl" className="text-success" />
                   ) : (
-                    <i className="bi bi-toggle2-off text-secondary"></i>
+                    <CIcon icon={cilToggleOff} size="xl" className="text-secondary" />
                   )}
                 </CTableDataCell>
               </CTableRow>
             ))
           ) : (
             <CTableRow>
-              <CTableDataCell colSpan={2}>Aucune donnée trouvée.</CTableDataCell>
+              <CTableDataCell className="text-center" colSpan={4}>
+                Aucune donnée trouvée.
+              </CTableDataCell>
             </CTableRow>
           )}
         </CTableBody>
@@ -221,6 +230,8 @@ const UsersPage = () => {
         <CModalHeader>
           <CModalTitle id="StaticBackdropExampleLabel">Gestion d'un utilisateur</CModalTitle>
         </CModalHeader>
+
+        {/*  */}
         <CModalBody>
           <div className="row">
             <div className="col-8">
@@ -279,58 +290,69 @@ const UsersPage = () => {
               />
             </div>
           </div>
+          <div className="mb-3">
+            <CFormInput
+              type="text"
+              id="floatingInput"
+              floatingClassName=""
+              floatingLabel="Nom de l'utilisateur"
+              placeholder="pg11"
+              value={entity.name}
+              onChange={(e) => setEntity({ ...entity, name: e.target.value })}
+              invalid={errors?.name}
+              disabled={
+                createMutation.isPending ||
+                updateMutation.isPending ||
+                deleteMutation.isPending ||
+                operation === 'delete'
+              }
+            />
+            {errors.name && <span className="text-danger fst-italic small">{errors.name}</span>}
+          </div>
 
-          <CFormInput
-            type="text"
-            id="floatingInput"
-            floatingClassName="mb-3"
-            floatingLabel="Nom de l'utilisateur"
-            placeholder="pg11"
-            value={entity.name}
-            onChange={(e) => setEntity({ ...entity, name: e.target.value })}
-            disabled={
-              createMutation.isPending ||
-              updateMutation.isPending ||
-              deleteMutation.isPending ||
-              operation === 'delete'
-            }
-          />
+          <div className="mb-3">
+            <CFormInput
+              type="email"
+              id="floatingInputemail"
+              floatingClassName=""
+              floatingLabel="Email de l'utilisateur"
+              placeholder="email"
+              value={entity.email}
+              onChange={(e) => setEntity({ ...entity, email: e.target.value })}
+              invalid={errors?.email}
+              disabled={
+                createMutation.isPending ||
+                updateMutation.isPending ||
+                deleteMutation.isPending ||
+                operation === 'delete'
+              }
+            />
+            {errors.email && <span className="text-danger fst-italic small">{errors.email}</span>}
+          </div>
 
-          <CFormInput
-            type="email"
-            id="floatingInputemail"
-            floatingClassName="mb-3"
-            floatingLabel="Email de l'utilisateur"
-            placeholder="email"
-            value={entity.email}
-            onChange={(e) => setEntity({ ...entity, email: e.target.value })}
-            disabled={
-              createMutation.isPending ||
-              updateMutation.isPending ||
-              deleteMutation.isPending ||
-              operation === 'delete'
-            }
-          />
+          <div className="mb-3">
+            <CFormInput
+              type="password"
+              id="floatingInputpassword"
+              floatingClassName="mb-3"
+              floatingLabel="Mot de passe de l'utilisateur"
+              placeholder="password"
+              value={entity.password}
+              onChange={(e) => setEntity({ ...entity, password: e.target.value })}
+              invalid={errors?.password}
+              disabled={
+                createMutation.isPending ||
+                updateMutation.isPending ||
+                deleteMutation.isPending ||
+                operation === 'delete'
+              }
+            />
+            {errors.name && <span className="text-danger fst-italic small">{errors.name}</span>}
+          </div>
 
-          <CFormInput
-            type="password"
-            id="floatingInputpassword"
-            floatingClassName="mb-3"
-            floatingLabel="Mode de passe de l'utilisateur"
-            placeholder="password"
-            value={entity.password}
-            onChange={(e) => setEntity({ ...entity, password: e.target.value })}
-            disabled={
-              createMutation.isPending ||
-              updateMutation.isPending ||
-              deleteMutation.isPending ||
-              operation === 'delete'
-            }
-          />
-
-          {createMutation.isError && (
+          {/* {createMutation.isError && (
             <CAlert color="danger" className="mb-0 mt-2 py-2">
-              {createMutation.error.message}
+              {createMutation?.error?.message}
             </CAlert>
           )}
 
@@ -344,8 +366,10 @@ const UsersPage = () => {
             <CAlert color="danger" className="mb-0 mt-2 py-2">
               {deleteMutation.error.message}
             </CAlert>
-          )}
+          )} */}
         </CModalBody>
+
+        {/*  */}
         <CModalFooter className="d-flex gap-1">
           {operation === 'delete' && (
             <CButton
