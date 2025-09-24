@@ -1,6 +1,8 @@
 // import { formatDistanceToNow } from "date-fns/formatDistanceToNow"
 // import { fr } from "date-fns/locale";
 
+import { USER_TYPE } from './types'
+
 // export function formatDateAgo(theDate) {
 //     return formatDistanceToNow(new Date(theDate), {
 //         addSuffix: true,
@@ -8,27 +10,29 @@
 //     })
 // }
 
-export const getUserRole = (user) => {
-  let re = ''
-  switch (user?.role) {
-    case 'ADMIN':
-      re = `Administrateur`
-      break
+// export const getUserRole = (user) => {
+//   let re = ''
+//   let role = USER_TYPE.filter((u) => u.value === user?.role)[0]?.value
+//   console.log(`${user?.name} ${role}`)
+//   switch (role) {
+//     case 'ADMIN':
+//       re = `ADMINISTRATEUR`
+//       break
 
-    case 'SUPER_ADMIN':
-      re = `Super Administrateur`
-      break
+//     case 'SUPER_ADMIN':
+//       re = `SUPER ADMIN`
+//       break
 
-    case 'USER':
-      re = `Utilisateur`
-      break
+//     case 'USER':
+//       re = `UTILISATEUR`
+//       break
 
-    default:
-      re = `NON ATTRIBUÉ`
-      break
-  }
-  return re
-}
+//     default:
+//       re = `NON ATTRIBUÉ`
+//       break
+//   }
+//   return re.toUpperCase()
+// }
 
 // CETTE FONCTION SERT POUR CREER UNE LISTE POUR PAGINATION
 export function getMultiplesOf(num, mult = 10) {

@@ -1,410 +1,126 @@
-import CIcon from '@coreui/icons-react'
-import {
-  CAlert,
-  CButton,
-  CFormCheck,
-  CFormInput,
-  CFormSelect,
-  CModal,
-  CModalBody,
-  CModalFooter,
-  CModalHeader,
-  CModalTitle,
-  CSpinner,
-  CTable,
-  CTableBody,
-  CTableDataCell,
-  CTableHead,
-  CTableHeaderCell,
-  CTableRow,
-} from '@coreui/react'
-import { useState } from 'react'
-import {
-  useCreateUserMutation,
-  useDeleteUserMutation,
-  fecthUsersQuery,
-  useUpdateUserMutation,
-} from '../../hooks/useUsers'
+import { useCallback, useState } from 'react'
+import { useUserMutations } from '../../hooks/useUsers'
 import { useQuery } from '@tanstack/react-query'
-import { cilPenNib, cilToggleOff, cilToggleOn, cilTrash } from '@coreui/icons'
-import { USER_TYPE } from '../../utils/types'
-import TableHead from './TableHead'
 import { toast } from 'react-toastify'
+import TableHeader from '../components/table/TableHeader'
+import parseApiErrors from '../../utils/parseApiErrors'
+import useEntityPagination from '../../hooks/useEntityPagination'
+import UserTable from './UserTable'
+import UserModal from './UserModal'
 
 const UsersPage = () => {
-  const getAllQuery = useQuery(fecthUsersQuery())
-
   const [visible, setVisible] = useState(false)
   const [operation, setOperation] = useState('')
-  const initialVal = { id: '', name: '', email: '', password: '', active: true }
-
-  const [entity, setEntity] = useState(initialVal)
-  const createMutation = useCreateUserMutation()
-  const deleteMutation = useDeleteUserMutation()
-  const updateMutation = useUpdateUserMutation()
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const data = {
-      id: entity.id,
-      name: entity.name,
-      email: entity.email,
-      password: entity.password || '',
-      role: entity.role,
-      active: entity.active,
-    }
-
-    switch (operation) {
-      case 'create':
-        createMutation.mutate(data, {
-          onSuccess: () => {
-            setVisible(!visible)
-            handleResetAll()
-            toast.success('Ajouté avec succès.')
-          },
-        })
-        break
-      case 'delete':
-        deleteMutation.mutate(data, {
-          onSuccess: () => {
-            setVisible(!visible)
-            handleResetAll()
-            toast.success('Supprimé avec succès.')
-          },
-        })
-        break
-      case 'update':
-        updateMutation.mutate(data, {
-          onSuccess: () => {
-            setVisible(!visible)
-            handleResetAll()
-            toast.success('Modifié avec succès.')
-          },
-        })
-        break
-      default:
-        break
-    }
+  const initialVal = {
+    id: '',
+    name: '',
+    email: '',
+    password: '',
+    active: true,
+    role: '',
+    lastName: '',
   }
+  const [entity, setEntity] = useState(initialVal)
 
-  const errors =
-    createMutation.error?.response?.data?.errors ||
-    deleteMutation.error?.response?.data?.errors ||
-    updateMutation.error?.response?.data?.errors ||
-    {}
+  const mutations = useUserMutations()
+  const getAllQuery = useQuery(mutations.fetch)
+
+  const currentMutation = mutations[operation]
+  const isDisabled = currentMutation?.isPending
+  const errors = parseApiErrors(currentMutation?.error)
+  const errorUnique = typeof errors === 'string' && errors
 
   const handleResetAll = () => {
     setEntity(initialVal)
-    createMutation.reset()
-    deleteMutation.reset()
-    updateMutation.reset()
+    currentMutation.reset()
     setOperation('create')
   }
 
-  const [search, setSearch] = useState('')
-  const handleSearch = (e) => {
-    setCurrentPage(1)
-    const newSearchValue = e.target.value
-    if (newSearchValue !== search) {
-      setSearch(newSearchValue)
-    }
+  const messages = {
+    create: 'Ajouté avec succès.',
+    update: 'Modifié avec succès.',
+    delete: 'Supprimé avec succès.',
   }
-  // Filter the entitys based on the search query
-  const filteredEntitys = getAllQuery.data?.filter((el) =>
-    el.name.toLowerCase().includes(search.toLowerCase()),
-  )
 
-  // Pagination States
-  const [currentPage, setCurrentPage] = useState(1)
-  const [entitysPerPage, setEntitysPerPage] = useState(10)
-  // Calculate current entitys to display
-  const indexOfLastEntity = currentPage * entitysPerPage
-  const indexOfFirstEntity = indexOfLastEntity - entitysPerPage
-  const currentEntitys = filteredEntitys?.slice(indexOfFirstEntity, indexOfLastEntity)
-  // Handle page change
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber)
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    currentMutation.mutate(entity, {
+      onSuccess: () => {
+        setVisible(false)
+        handleResetAll()
+        toast.success(messages[operation])
+      },
+    })
   }
-  // Calculate total pages
-  const totalPages = Math.ceil(filteredEntitys?.length / entitysPerPage)
+
+  // Hook Recherche + pagination
+  const {
+    search,
+    setSearch,
+    currentPage,
+    setCurrentPage,
+    entitysPerPage,
+    setEntitysPerPage,
+    currentEntitys,
+    totalPages,
+    filteredEntitys,
+  } = useEntityPagination(getAllQuery.data)
+
+  const handleEdit = useCallback((user) => {
+    setEntity(user)
+    setOperation('update')
+    setVisible(true)
+  }, [])
+
+  const handleDelete = useCallback((user) => {
+    setEntity(user)
+    setOperation('delete')
+    setVisible(true)
+  }, [])
 
   return (
     <div>
-      <h6 className="text-danger"> TODO: vérifier update, probleme de validation des données</h6>
-      <TableHead
+      <TableHeader
         title="Liste des utilisateurs"
-        getAllQuery={getAllQuery}
+        isDisabled={isDisabled}
+        listLength={getAllQuery?.data?.length}
         search={search}
-        handleSearch={handleSearch}
+        handleSearch={(e) => {
+          setCurrentPage(1)
+          setSearch(e.target.value)
+        }}
         setEntity={setEntity}
         initialVal={initialVal}
         setVisible={setVisible}
         visible={visible}
         setOperation={setOperation}
-        tableId={'myTable'}
-        excelFileName={'Liste des utilisateurs'}
+        tableId="myTable"
+        excelFileName="Liste des utilisateurs"
         currentEntitys={currentEntitys}
         entitysPerPage={entitysPerPage}
         setEntitysPerPage={setEntitysPerPage}
         setCurrentPage={setCurrentPage}
         currentPage={currentPage}
-        handlePageChange={handlePageChange}
+        handlePageChange={setCurrentPage}
         totalPages={totalPages}
         filteredEntitys={filteredEntitys}
       />
 
-      <CTable responsive striped hover id="myTable">
-        <CTableHead>
-          <CTableRow>
-            <CTableHeaderCell scope="col">Nom de l'utilisateur</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Email</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Rôle</CTableHeaderCell>
-            <CTableHeaderCell scope="col">Active</CTableHeaderCell>
-          </CTableRow>
-        </CTableHead>
-        <CTableBody>
-          {currentEntitys && currentEntitys?.length > 0 ? (
-            currentEntitys?.map((item, index) => (
-              <CTableRow key={index}>
-                <CTableDataCell>
-                  <CButton
-                    size="sm"
-                    color="danger"
-                    variant="outline"
-                    className="rounded-pill"
-                    onClick={() => {
-                      setEntity(item)
-                      setOperation('delete')
-                      setVisible(!visible)
-                    }}
-                  >
-                    <CIcon icon={cilTrash} />
-                  </CButton>{' '}
-                  <CButton
-                    size="sm"
-                    color="primary"
-                    variant="outline"
-                    className="rounded-pill"
-                    onClick={() => {
-                      setEntity(item)
-                      setOperation('update')
-                      setVisible(!visible)
-                    }}
-                  >
-                    <CIcon icon={cilPenNib} />
-                  </CButton>{' '}
-                  {item?.name}
-                </CTableDataCell>
+      <UserTable data={currentEntitys} onEdit={handleEdit} onDelete={handleDelete} />
 
-                <CTableDataCell>{item?.email}</CTableDataCell>
-                <CTableDataCell>{item?.role?.replace('_', ' ')}</CTableDataCell>
-                <CTableDataCell>
-                  {item?.active ? (
-                    <CIcon icon={cilToggleOn} size="xl" className="text-success" />
-                  ) : (
-                    <CIcon icon={cilToggleOff} size="xl" className="text-secondary" />
-                  )}
-                </CTableDataCell>
-              </CTableRow>
-            ))
-          ) : (
-            <CTableRow>
-              <CTableDataCell className="text-center" colSpan={4}>
-                Aucune donnée trouvée.
-              </CTableDataCell>
-            </CTableRow>
-          )}
-        </CTableBody>
-      </CTable>
-
-      {/* CREATE/UPDATE/DELETE  */}
-      <CModal
-        backdrop="static"
+      {/* ✅ Modal externalisé */}
+      <UserModal
         visible={visible}
-        onClose={() => {
-          setVisible(false)
-          handleResetAll()
-        }}
-        aria-labelledby="StaticBackdropExampleLabel"
-      >
-        <CModalHeader>
-          <CModalTitle id="StaticBackdropExampleLabel">Gestion d'un utilisateur</CModalTitle>
-        </CModalHeader>
-
-        {/*  */}
-        <CModalBody>
-          <div className="row">
-            <div className="col-8">
-              <CFormSelect
-                id="floatingSelect"
-                floatingClassName="mb-3"
-                floatingLabel="Choisir un rôle"
-                aria-label="Floating label select example"
-                value={entity?.role}
-                onChange={(e) => setEntity({ ...entity, role: e.target.value })}
-                disabled={
-                  createMutation.isPending ||
-                  updateMutation.isPending ||
-                  deleteMutation.isPending ||
-                  operation === 'delete'
-                }
-              >
-                <option></option>
-                {USER_TYPE.map((u_type, index) => (
-                  <option key={index} value={u_type.value}>
-                    {u_type.title}
-                  </option>
-                ))}
-              </CFormSelect>
-            </div>
-            <div className="col">
-              <CFormCheck
-                type="radio"
-                name="inlineRadioOptions"
-                id="inlineCheckbox1"
-                value="option1"
-                label="Active"
-                checked={entity?.active}
-                onChange={(e) => setEntity({ ...entity, active: true })}
-                disabled={
-                  createMutation.isPending ||
-                  updateMutation.isPending ||
-                  deleteMutation.isPending ||
-                  operation === 'delete'
-                }
-              />
-              <CFormCheck
-                type="radio"
-                name="inlineRadioOptions"
-                id="inlineCheckbox2"
-                value="option2"
-                label="InActive"
-                checked={!entity?.active}
-                onChange={(e) => setEntity({ ...entity, active: false })}
-                disabled={
-                  createMutation.isPending ||
-                  updateMutation.isPending ||
-                  deleteMutation.isPending ||
-                  operation === 'delete'
-                }
-              />
-            </div>
-          </div>
-          <div className="mb-3">
-            <CFormInput
-              type="text"
-              id="floatingInput"
-              floatingClassName=""
-              floatingLabel="Nom de l'utilisateur"
-              placeholder="pg11"
-              value={entity.name}
-              onChange={(e) => setEntity({ ...entity, name: e.target.value })}
-              invalid={errors?.name}
-              disabled={
-                createMutation.isPending ||
-                updateMutation.isPending ||
-                deleteMutation.isPending ||
-                operation === 'delete'
-              }
-            />
-            {errors.name && <span className="text-danger fst-italic small">{errors.name}</span>}
-          </div>
-
-          <div className="mb-3">
-            <CFormInput
-              type="email"
-              id="floatingInputemail"
-              floatingClassName=""
-              floatingLabel="Email de l'utilisateur"
-              placeholder="email"
-              value={entity.email}
-              onChange={(e) => setEntity({ ...entity, email: e.target.value })}
-              invalid={errors?.email}
-              disabled={
-                createMutation.isPending ||
-                updateMutation.isPending ||
-                deleteMutation.isPending ||
-                operation === 'delete'
-              }
-            />
-            {errors.email && <span className="text-danger fst-italic small">{errors.email}</span>}
-          </div>
-
-          <div className="mb-3">
-            <CFormInput
-              type="password"
-              id="floatingInputpassword"
-              floatingClassName="mb-3"
-              floatingLabel="Mot de passe de l'utilisateur"
-              placeholder="password"
-              value={entity.password}
-              onChange={(e) => setEntity({ ...entity, password: e.target.value })}
-              invalid={errors?.password}
-              disabled={
-                createMutation.isPending ||
-                updateMutation.isPending ||
-                deleteMutation.isPending ||
-                operation === 'delete'
-              }
-            />
-            {errors.name && <span className="text-danger fst-italic small">{errors.name}</span>}
-          </div>
-
-          {/* {createMutation.isError && (
-            <CAlert color="danger" className="mb-0 mt-2 py-2">
-              {createMutation?.error?.message}
-            </CAlert>
-          )}
-
-          {updateMutation.isError && (
-            <CAlert color="danger" className="mb-0 mt-2 py-2">
-              {updateMutation.error.message}
-            </CAlert>
-          )}
-
-          {deleteMutation.isError && (
-            <CAlert color="danger" className="mb-0 mt-2 py-2">
-              {deleteMutation.error.message}
-            </CAlert>
-          )} */}
-        </CModalBody>
-
-        {/*  */}
-        <CModalFooter className="d-flex gap-1">
-          {operation === 'delete' && (
-            <CButton
-              disabled={
-                createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-              }
-              onClick={handleSubmit}
-              size="sm"
-              color="danger"
-              variant="outline"
-            >
-              <div className="d-flex gap-1 align-items-center justify-content-end">
-                {deleteMutation.isPending && <CSpinner size="sm" />} <span>Supprimer</span>
-              </div>
-            </CButton>
-          )}
-
-          {operation !== 'delete' && (
-            <CButton
-              disabled={
-                deleteMutation.isPending || createMutation.isPending || updateMutation.isPending
-              }
-              onClick={handleSubmit}
-              size="sm"
-              color="success"
-              variant="outline"
-            >
-              <div className="d-flex gap-1 align-items-center justify-content-end">
-                {(createMutation.isPending || updateMutation.isPending) && <CSpinner size="sm" />}{' '}
-                <span>Sauvegarder</span>
-              </div>
-            </CButton>
-          )}
-        </CModalFooter>
-      </CModal>
+        setVisible={setVisible}
+        entity={entity}
+        setEntity={setEntity}
+        errors={errors}
+        isDisabled={isDisabled}
+        operation={operation}
+        onSubmit={handleSubmit}
+        onReset={handleResetAll}
+        errorUnique={errorUnique}
+      />
     </div>
   )
 }

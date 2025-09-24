@@ -21,7 +21,7 @@ export function useLogoutMutation() {
   })
 }
 
-export function useCreateUserMutation() {
+function useCreateUserMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data) => apiRequest(API_PATHS.AUTH.REGISTER, 'POST', data),
@@ -32,7 +32,7 @@ export function useCreateUserMutation() {
   })
 }
 
-export function useDeleteUserMutation() {
+function useDeleteUserMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (user) => apiRequest(API_PATHS.AUTH.DELETE_USER(user?.id), 'DELETE'),
@@ -54,7 +54,7 @@ export function useDeleteUserMutation() {
   })
 }
 
-export function useUpdateUserMutation() {
+function useUpdateUserMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data) => apiRequest(API_PATHS.AUTH.UPDATE_USER, 'PATCH', data),
@@ -65,7 +65,7 @@ export function useUpdateUserMutation() {
   })
 }
 
-export function fecthUsersQuery() {
+function useFecthUsersQuery() {
   return queryOptions({
     queryKey: ['usersList'],
     queryFn: () => apiRequest(API_PATHS.AUTH.GET_ALL_USERS, 'GET'),
@@ -77,4 +77,18 @@ export function fecthUsersQuery() {
 
 const invalidateUsersList = (queryClient) => {
   queryClient.invalidateQueries({ queryKey: ['usersList'] })
+}
+
+export const useUserMutations = () => {
+  const fetch = useFecthUsersQuery()
+  const create = useCreateUserMutation()
+  const update = useUpdateUserMutation()
+  const del = useDeleteUserMutation()
+
+  return {
+    create,
+    update,
+    delete: del,
+    fetch,
+  }
 }
