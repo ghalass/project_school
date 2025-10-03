@@ -4,6 +4,7 @@ import yup from "../config/yup.js";
 
 export const signupValidatorSchema = yup.object().shape({
   name: yup.string().required().label("Nom d'utilisateur"),
+  lastName: yup.string().optional(),
   email: yup.string().email().required().label("Addresse E-Mail"),
   password: yup.string().min(6).required().label("Mot de passe"),
 });

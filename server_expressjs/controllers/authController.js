@@ -13,14 +13,16 @@ import prisma from "../utils/prismaClient.js";
 const tokenExpireIn = 7 * 60 * 60 * 1000;
 
 export const signupUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, lastName, email, password } = req.body;
+  console.log(lastName);
+
   const msgEmailUsed = "E-mail déjà utilisé.";
   const userExist = await prisma.user.findFirst({ where: { email } });
   if (userExist)
     return res.status(HttpStatus.CONFLICT).json({ error: msgEmailUsed });
   const hashedPassword = await hashPassword(password);
   const createdUser = await prisma.user.create({
-    data: { name, email, password: hashedPassword },
+    data: { name, lastName, email, password: hashedPassword },
   });
   res.status(HttpStatus.CREATED).json(hidePassword(createdUser));
 };

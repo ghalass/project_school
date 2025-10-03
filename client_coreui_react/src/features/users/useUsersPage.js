@@ -18,11 +18,11 @@ export const useUsersPage = () => {
   const initialVal = {
     id: '',
     name: '',
+    lastName: '',
     email: '',
     password: '',
     active: true,
     role: '',
-    lastName: '',
   }
 
   const [entity, setEntity] = useState(initialVal)

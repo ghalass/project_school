@@ -60,6 +60,15 @@ const UserModal = ({
         />
 
         <TextInput
+          label="Prénom de l'utilisateur"
+          placeholder="Prénom"
+          value={entity?.lastName}
+          onChange={(e) => setEntity({ ...entity, lastName: e.target.value })}
+          error={errors?.lastName}
+          disabled={diabledOnDelete}
+        />
+
+        <TextInput
           type="email"
           label="Email de l'utilisateur"
           placeholder="Email"
