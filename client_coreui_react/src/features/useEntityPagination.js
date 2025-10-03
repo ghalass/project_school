@@ -13,9 +13,16 @@ const useEntityPagination = (data = [], defaultPerPage = DEFAULT_PER_PAGE) => {
   const [entitysPerPage, setEntitysPerPage] = useState(defaultPerPage)
 
   // 🔍 Filtrage
+
   const filteredEntitys = useMemo(() => {
     if (!data) return []
-    return data.filter((el) => el.name?.toLowerCase().includes(search.toLowerCase()))
+    return data.filter(
+      (el) =>
+        el.name?.toLowerCase().includes(search.toLowerCase()) ||
+        el.lastName?.toLowerCase().includes(search.toLowerCase()) ||
+        el.email?.toLowerCase().includes(search.toLowerCase()) ||
+        el.role?.toLowerCase().includes(search.toLowerCase()),
+    )
   }, [data, search])
 
   // 📄 Pagination

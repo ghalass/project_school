@@ -16,7 +16,7 @@ const UserTable = ({ data, onEdit, onDelete }) => {
   const displayColumnSm = 'd-none d-sm-table-cell'
 
   return (
-    <CTable responsive striped hover>
+    <CTable responsive striped hover id="myTable">
       <CTableHead>
         <CTableRow>
           <CTableHeaderCell scope="col">Nom</CTableHeaderCell>
@@ -68,9 +68,15 @@ const UserTable = ({ data, onEdit, onDelete }) => {
               </CTableDataCell>
               <CTableDataCell className={displayColumnMd}>
                 {item?.active ? (
-                  <CIcon icon={cilToggleOn} size="xl" className="text-success" />
+                  <>
+                    <CIcon icon={cilToggleOn} size="xl" className="text-success" />
+                    <span className="d-none">Oui</span>
+                  </>
                 ) : (
-                  <CIcon icon={cilToggleOff} size="xl" className="text-secondary" />
+                  <>
+                    <CIcon icon={cilToggleOff} size="xl" className="text-secondary" />
+                    <span className="d-none">Non</span>
+                  </>
                 )}
               </CTableDataCell>
             </CTableRow>
