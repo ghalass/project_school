@@ -1,14 +1,15 @@
 // src/hooks/useEntityPagination.js
 import { useMemo, useState } from 'react'
+import { DEFAULT_PAGE, DEFAULT_PER_PAGE } from '../utils/constantes'
 
 /**
  * Hook pour gérer recherche et pagination
  * @param {Array} data - tableau de données
  * @param {number} defaultPerPage - nombre par page
  */
-const useEntityPagination = (data = [], defaultPerPage = 10) => {
+const useEntityPagination = (data = [], defaultPerPage = DEFAULT_PER_PAGE) => {
   const [search, setSearch] = useState('')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(DEFAULT_PAGE)
   const [entitysPerPage, setEntitysPerPage] = useState(defaultPerPage)
 
   // 🔍 Filtrage

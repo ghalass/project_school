@@ -6,6 +6,7 @@ import TableSearch from '../components/table/TableSearch'
 import TableExport from '../components/table/TableExport'
 import TablePagination from '../components/table/TablePagination'
 import { useUsersPage } from '../../features/users/useUsersPage'
+import { DEFAULT_PAGE } from '../../utils/constantes'
 
 const UsersPage = () => {
   const {
@@ -16,6 +17,7 @@ const UsersPage = () => {
     currentPage,
     setCurrentPage,
     entitysPerPage,
+    currentEntitys,
     setEntitysPerPage,
     totalPages,
     filteredEntitys,
@@ -45,7 +47,7 @@ const UsersPage = () => {
           <TableSearch
             search={search}
             handleSearch={(e) => {
-              setCurrentPage(1)
+              setCurrentPage(DEFAULT_PAGE)
               setSearch(e.target.value)
             }}
           />
@@ -83,7 +85,7 @@ const UsersPage = () => {
       </div>
 
       {/* Tableau */}
-      <UserTable data={filteredEntitys} onEdit={handleEdit} onDelete={handleDelete} />
+      <UserTable data={currentEntitys} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   )
 }

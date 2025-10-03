@@ -63,6 +63,7 @@ export const useUsersPage = () => {
     setEntitysPerPage,
     totalPages,
     filteredEntitys,
+    currentEntitys,
   } = useEntityPagination(getAllQuery.data)
 
   // Réinitialisation
@@ -113,6 +114,7 @@ export const useUsersPage = () => {
     setEntitysPerPage,
     totalPages,
     filteredEntitys,
+    currentEntitys,
     getAllQuery,
     isDisabled,
     errors,
