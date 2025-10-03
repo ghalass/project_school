@@ -14,7 +14,7 @@ createRoot(document.getElementById('root')).render(
   <AuthContextProvider>
     <QueryClientProvider client={queryClient}>
       <ToastContainer
-        position="bottom-right"
+        position="top-center"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop

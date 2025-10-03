@@ -1,126 +1,89 @@
-import { useCallback, useState } from 'react'
-import { useUserMutations } from '../../hooks/useUsers'
-import { useQuery } from '@tanstack/react-query'
-import { toast } from 'react-toastify'
-import TableHeader from '../components/table/TableHeader'
-import parseApiErrors from '../../utils/parseApiErrors'
-import useEntityPagination from '../../hooks/useEntityPagination'
+// src/views/users/UsersPage.jsx
 import UserTable from './UserTable'
 import UserModal from './UserModal'
+import TableTitle from '../components/table/TableTitle'
+import TableSearch from '../components/table/TableSearch'
+import TableExport from '../components/table/TableExport'
+import TablePagination from '../components/table/TablePagination'
+import { useUsersPage } from '../../features/users/useUsersPage'
 
 const UsersPage = () => {
-  const [visible, setVisible] = useState(false)
-  const [operation, setOperation] = useState('')
-  const initialVal = {
-    id: '',
-    name: '',
-    email: '',
-    password: '',
-    active: true,
-    role: '',
-    lastName: '',
-  }
-  const [entity, setEntity] = useState(initialVal)
-
-  const mutations = useUserMutations()
-  const getAllQuery = useQuery(mutations.fetch)
-
-  const currentMutation = mutations[operation]
-  const isDisabled = currentMutation?.isPending
-  const errors = parseApiErrors(currentMutation?.error)
-  const errorUnique = typeof errors === 'string' && errors
-
-  const handleResetAll = () => {
-    setEntity(initialVal)
-    currentMutation.reset()
-    setOperation('create')
-  }
-
-  const messages = {
-    create: 'Ajouté avec succès.',
-    update: 'Modifié avec succès.',
-    delete: 'Supprimé avec succès.',
-  }
-
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    currentMutation.mutate(entity, {
-      onSuccess: () => {
-        setVisible(false)
-        handleResetAll()
-        toast.success(messages[operation])
-      },
-    })
-  }
-
-  // Hook Recherche + pagination
   const {
+    entity,
+    setEntity,
     search,
     setSearch,
     currentPage,
     setCurrentPage,
     entitysPerPage,
     setEntitysPerPage,
-    currentEntitys,
     totalPages,
     filteredEntitys,
-  } = useEntityPagination(getAllQuery.data)
-
-  const handleEdit = useCallback((user) => {
-    setEntity(user)
-    setOperation('update')
-    setVisible(true)
-  }, [])
-
-  const handleDelete = useCallback((user) => {
-    setEntity(user)
-    setOperation('delete')
-    setVisible(true)
-  }, [])
+    getAllQuery,
+    isDisabled,
+    errors,
+    errorUnique,
+    handleResetAll,
+    handleEdit,
+    handleDelete,
+    handleCreate,
+    handleSubmit,
+    op,
+  } = useUsersPage()
 
   return (
     <div>
-      <TableHeader
-        title="Liste des utilisateurs"
-        isDisabled={isDisabled}
-        listLength={getAllQuery?.data?.length}
-        search={search}
-        handleSearch={(e) => {
-          setCurrentPage(1)
-          setSearch(e.target.value)
-        }}
-        setEntity={setEntity}
-        initialVal={initialVal}
-        setVisible={setVisible}
-        visible={visible}
-        setOperation={setOperation}
-        tableId="myTable"
-        excelFileName="Liste des utilisateurs"
-        currentEntitys={currentEntitys}
-        entitysPerPage={entitysPerPage}
-        setEntitysPerPage={setEntitysPerPage}
-        setCurrentPage={setCurrentPage}
-        currentPage={currentPage}
-        handlePageChange={setCurrentPage}
-        totalPages={totalPages}
-        filteredEntitys={filteredEntitys}
-      />
+      {/* Header avec titre + recherche + modal */}
+      <div className="d-flex align-items-center justify-content-between gap-1 mb-2">
+        <TableTitle
+          title="Liste des utilisateurs"
+          isDisabled={isDisabled}
+          listLength={getAllQuery?.data?.length}
+        />
 
-      <UserTable data={currentEntitys} onEdit={handleEdit} onDelete={handleDelete} />
+        <div className="d-flex gap-1">
+          <TableSearch
+            search={search}
+            handleSearch={(e) => {
+              setCurrentPage(1)
+              setSearch(e.target.value)
+            }}
+          />
 
-      {/* ✅ Modal externalisé */}
-      <UserModal
-        visible={visible}
-        setVisible={setVisible}
-        entity={entity}
-        setEntity={setEntity}
-        errors={errors}
-        isDisabled={isDisabled}
-        operation={operation}
-        onSubmit={handleSubmit}
-        onReset={handleResetAll}
-        errorUnique={errorUnique}
-      />
+          <UserModal
+            handleCreate={handleCreate}
+            entity={entity}
+            setEntity={setEntity}
+            errors={errors}
+            isDisabled={isDisabled}
+            onSubmit={handleSubmit}
+            onReset={handleResetAll}
+            errorUnique={errorUnique}
+            op={op}
+          />
+        </div>
+      </div>
+
+      {/* Export + pagination */}
+      <div className="d-flex justify-content-between mb-2">
+        <TableExport
+          tableId="myTable"
+          excelFileName="Liste des utilisateurs"
+          filteredEntitys={filteredEntitys}
+        />
+        <TablePagination
+          filteredEntitysLength={filteredEntitys?.length}
+          entitysPerPage={entitysPerPage}
+          setEntitysPerPage={setEntitysPerPage}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          handlePageChange={setCurrentPage}
+          totalPages={totalPages}
+        />
+      </div>
+
+      {/* Tableau */}
+      <UserTable data={filteredEntitys} onEdit={handleEdit} onDelete={handleDelete} />
     </div>
   )
 }

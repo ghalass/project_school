@@ -18,7 +18,8 @@ import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
-import { useLoginMutation } from '../hooks/useUsers'
+import { useLoginMutation } from '../features/users/users.queries'
+
 import { useAuthContext } from '../context/AuthContext'
 
 const Login = () => {
@@ -66,6 +67,7 @@ const Login = () => {
                         placeholder="Email"
                         value={formData?.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        disabled={loginMutation?.isPending}
                       />
                     </CInputGroup>
 
@@ -79,6 +81,7 @@ const Login = () => {
                         autoComplete="current-password"
                         value={formData.password}
                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        disabled={loginMutation?.isPending}
                       />
                     </CInputGroup>
 

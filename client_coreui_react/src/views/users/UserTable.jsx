@@ -77,7 +77,7 @@ const UserTable = ({ data, onEdit, onDelete }) => {
           ))
         ) : (
           <CTableRow>
-            <CTableDataCell className="text-center" colSpan={4}>
+            <CTableDataCell className="text-center" colSpan={5}>
               Aucune donnée trouvée.
             </CTableDataCell>
           </CTableRow>

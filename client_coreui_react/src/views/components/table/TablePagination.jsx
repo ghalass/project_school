@@ -3,11 +3,11 @@ import { CPagination, CPaginationItem } from '@coreui/react'
 import { getMultiplesOf } from '../../../utils/func'
 
 const TablePagination = ({
-  filteredEntitys,
   entitysPerPage,
   setEntitysPerPage,
-  currentPage,
   setCurrentPage,
+  filteredEntitysLength,
+  currentPage,
   handlePageChange,
   totalPages,
 }) => {
@@ -22,7 +22,7 @@ const TablePagination = ({
             setCurrentPage(1)
           }}
         >
-          {getMultiplesOf(filteredEntitys?.length, 5)?.map((item, i) => (
+          {getMultiplesOf(filteredEntitysLength, 5)?.map((item, i) => (
             <option key={i} value={item}>
               {item}
             </option>

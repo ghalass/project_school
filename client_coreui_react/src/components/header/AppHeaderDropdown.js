@@ -15,7 +15,8 @@ import avatar8 from './../../assets/images/avatars/8.jpg'
 
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import { useLogoutMutation } from '../../hooks/useUsers'
+import { useLogoutMutation } from '../../features/users/users.queries' // ✅ version refactorée
+
 import { useAuth, useAuthContext } from '../../context/AuthContext'
 
 const AppHeaderDropdown = () => {

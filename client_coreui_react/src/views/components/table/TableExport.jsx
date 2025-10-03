@@ -4,7 +4,7 @@ import CIcon from '@coreui/icons-react'
 import { CButton } from '@coreui/react'
 import { exportExcel } from '../../../utils/func'
 
-const TableExport = ({ tableId, excelFileName, currentEntitys }) => {
+const TableExport = ({ tableId, excelFileName, filteredEntitys }) => {
   return (
     <CButton
       size="sm"
@@ -12,7 +12,7 @@ const TableExport = ({ tableId, excelFileName, currentEntitys }) => {
       variant="outline"
       onClick={() => exportExcel(tableId, excelFileName)}
       className="rounded-pill"
-      disabled={!currentEntitys || currentEntitys.length === 0}
+      disabled={!filteredEntitys || filteredEntitys.length === 0}
     >
       Excel <CIcon icon={cilCloudDownload} />
     </CButton>
