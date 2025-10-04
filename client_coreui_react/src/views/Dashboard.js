@@ -2,8 +2,11 @@ import React from 'react'
 import CIcon from '@coreui/icons-react'
 import { cilChartPie, cilPeople } from '@coreui/icons'
 import { CCol, CRow, CWidgetStatsF } from '@coreui/react'
+import { useDashboardQuery } from '../features/dashboard/dashboard.queries'
 
 const Dashboard = () => {
+  const getDashboardQuery = useDashboardQuery()
+
   return (
     <>
       <h1>Dashboard</h1>
@@ -15,7 +18,7 @@ const Dashboard = () => {
             color="primary"
             icon={<CIcon icon={cilPeople} height={24} />}
             title="Utilisateurs"
-            value="89.9%"
+            value={getDashboardQuery?.data?.usersCount}
           />
         </CCol>
         <CCol xs={6}>

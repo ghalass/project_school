@@ -11,4 +11,7 @@ export const API_PATHS = {
     DELETE_USER: (userId) => `/user/${userId}`,
     GET_USER_INFO: '/user/getUserInfo',
   },
+  DASHBOARD: {
+    DASHBOARD: '/dashboard',
+  },
 }
