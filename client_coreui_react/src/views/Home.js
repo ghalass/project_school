@@ -6,7 +6,7 @@ const Home = () => {
   return (
     <>
       <div className="mt-2">
-        <h1 className="text-center">Welcome {`${user?.name} ${user?.lastName}`}</h1>
+        <h1 className="text-center">Welcome {`${user?.name} ${user?.lastName ?? ''}`}</h1>
       </div>
     </>
   )

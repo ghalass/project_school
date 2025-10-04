@@ -21,6 +21,7 @@ import { cilChatBubble, cilContrast, cilMenu, cilMoon, cilSun } from '@coreui/ic
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { useAuth } from '../context/AuthContext'
+import { getUserRole } from '../utils/func'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -129,7 +130,7 @@ const AppHeader = () => {
                 </CBadge>
 
                 <CBadge color="info" shape="rounded-pill">
-                  <span className="text-uppercase">{user?.role}</span>
+                  <span className="text-uppercase">{getUserRole(user)}</span>
                 </CBadge>
               </div>
             </div>

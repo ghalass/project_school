@@ -64,6 +64,11 @@ export const getUsers = async (req, res) => {
   res.status(HttpStatus.OK).json(usersWithoutPassword);
 };
 
+export const getUsersCount = async (req, res) => {
+  const usersCount = await prisma.user.count();
+  res.status(HttpStatus.OK).json(usersCount);
+};
+
 /**
  * Mettre à jour un utilisateur
  */

@@ -10,13 +10,14 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilPenNib, cilToggleOff, cilToggleOn, cilTrash } from '@coreui/icons'
+import { getUserRole } from '../../utils/func'
 
 const UserTable = ({ data, onEdit, onDelete }) => {
   const displayColumnMd = 'd-none d-md-table-cell'
   const displayColumnSm = 'd-none d-sm-table-cell'
 
   return (
-    <CTable responsive striped hover id="myTable">
+    <CTable responsive="md" striped hover id="myTable">
       <CTableHead>
         <CTableRow>
           <CTableHeaderCell scope="col">Nom</CTableHeaderCell>
@@ -63,9 +64,7 @@ const UserTable = ({ data, onEdit, onDelete }) => {
 
               <CTableDataCell className={displayColumnSm}>{item?.lastName}</CTableDataCell>
               <CTableDataCell>{item?.email}</CTableDataCell>
-              <CTableDataCell className={displayColumnMd}>
-                {item?.role?.replace('_', ' ')}
-              </CTableDataCell>
+              <CTableDataCell className={displayColumnMd}>{getUserRole(item)}</CTableDataCell>
               <CTableDataCell className={displayColumnMd}>
                 {item?.active ? (
                   <>

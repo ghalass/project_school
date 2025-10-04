@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { useLogoutMutation } from '../../features/users/users.queries' // ✅ version refactorée
 
-import { useAuth, useAuthContext } from '../../context/AuthContext'
+import { useAuthContext } from '../../context/AuthContext'
 
 const AppHeaderDropdown = () => {
   const logoutMutation = useLogoutMutation()

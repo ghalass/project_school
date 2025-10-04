@@ -3,41 +3,6 @@
 @adminToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsIm5hbWUiOiJhbGkiLCJsYXN0TmFtZSI6ImdoYWxhc3MiLCJlbWFpbCI6ImFsaUBnbWFpbC5jb20iLCJyb2xlIjoiQURNSU4iLCJhY3RpdmUiOnRydWUsImlhdCI6MTc1OTU3NTQ0NywiZXhwIjoxNzU5NjAwNjQ3fQ.3IS61qtShCpdZt64YzZYSAAKEkJ0tEgVuMubM0fipfc
 @userToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIsIm5hbWUiOiJhbGkiLCJlbWFpbCI6ImFsaUBnbWFpbC5jb20iLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc1ODUyNzE4OCwiZXhwIjoxNzU4NTUyMzg4fQ.Igzcrn27ys9s0gvIFtTIMom29EHJ_QBfk6eHJULnI7M
 
-### CREATE SUPER_ADMIN
-GET {{baseUrl}}/user/create_super_admin
-
-### GET ALL USERS (REQUIRE AUTH)
-GET {{baseUrl}}/user/users
-Cookie: jwt={{adminToken}};
-
 ### USERS COUNT (REQUIRE AUTH)
-GET {{baseUrl}}/user/users/count
+GET {{baseUrl}}/dashboard
 Cookie: jwt={{adminToken}};
-
-### DELETE USER (REQUIRE ADMIN OR SUPER_ADMIN)
-DELETE  {{baseUrl}}/6
-Cookie: jwt={{superAdminToken}};
-
-### GET USER BY EMAIL (REQUIRE AUTH)
-POST {{baseUrl}}/user/getByEmail
-Cookie: jwt={{userToken}};
-Content-Type: application/json
-
-{
-    "email":"ghalass@gmail.com"
-}
-
-### UPDATE USER (ADMIN OR SUPER_ADMIN)
-PATCH  {{baseUrl}}/user/updateUser
-Cookie: jwt={{adminToken}};
-Content-Type: application/json
-
-{
-    "id":10,
-    "name":"barhim",
-    "email":"brahim@gmail.com"
-}
-
-### TEST 404
-GET {{baseUrl}}/user/test
-Cookie: jwt={{superAdminToken}};

@@ -23,7 +23,7 @@ import { useLoginMutation } from '../features/users/users.queries'
 import { useAuthContext } from '../context/AuthContext'
 
 const Login = () => {
-  const initialVal = { email: 'ali@gmail.com', password: '123456' }
+  const initialVal = { email: 'ghalass@gmail.com', password: 'gh@l@ss@dmin' }
   const loginMutation = useLoginMutation()
   const [formData, setFormData] = useState(initialVal)
   const navigate = useNavigate()

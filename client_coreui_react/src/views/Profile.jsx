@@ -15,6 +15,7 @@ import CIcon from '@coreui/icons-react'
 import { useAuth } from '../context/AuthContext'
 import avatar8 from './../assets/images/avatars/8.jpg'
 import { cilPencil } from '@coreui/icons'
+import { getUserRole } from '../utils/func'
 
 const ProfilePage = () => {
   const { user } = useAuth()
@@ -57,7 +58,7 @@ const ProfilePage = () => {
             </CCardTitle>
             <CCardSubtitle className="mb-2 text-body-secondary text-uppercase">
               <CBadge color="info" shape="rounded-pill">
-                <span className="text-uppercase">{user?.role}</span>
+                <span className="text-uppercase">{getUserRole(user)}</span>
               </CBadge>
             </CCardSubtitle>
             <CCardText>

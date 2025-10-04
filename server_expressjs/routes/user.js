@@ -8,6 +8,7 @@ import {
   updateUser,
   deleteUser,
   createSuperAdmin,
+  getUsersCount,
 } from "../controllers/userController.js";
 
 import requireAuth from "../middleware/requireAuth.js";
@@ -30,6 +31,9 @@ router.get("/create_super_admin", asyncHandler(createSuperAdmin));
 
 // GET ALL USERS
 router.get("/users", [requireAuth, asyncHandler(getUsers)]);
+
+// USERS COUNT
+router.get("/users/count", [requireAuth, asyncHandler(getUsersCount)]);
 
 // get user by email
 router.post("/getByEmail", [

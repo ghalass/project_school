@@ -24,6 +24,7 @@ requiredEnv.forEach((key) => {
 import userRoutes from "./routes/user.js";
 import authRoutes from "./routes/auth.js";
 import rootRoutes from "./routes/root.js";
+import dashboardRoutes from "./routes/dashboard.js";
 
 // Pour __dirname en ESM :
 import { fileURLToPath } from "url";
@@ -62,6 +63,7 @@ app.use(logger);
 app.use("/", rootRoutes);
 app.use("/user", userRoutes);
 app.use("/auth", authRoutes);
+app.use("/dashboard", dashboardRoutes);
 
 // 404 ROUTE
 app.all("*", (req, res) => {

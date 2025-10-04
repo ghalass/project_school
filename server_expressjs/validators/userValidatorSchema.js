@@ -15,8 +15,8 @@ export const changePasswordValidatorSchema = yup.object().shape({
 export const updateUserValidatorSchema = yup.object().shape({
   id: yup.number().required().label("ID"),
   name: yup.string().optional().label("Mot de passe"),
-  lastName: yup.string().optional(),
-  email: yup.string().optional().label("Mot de passe"),
-  role: yup.string().optional().label("Mot de passe"),
-  active: yup.bool().optional().label("Mot de passe"),
+  lastName: yup.string().nullable().notRequired().label("Prénom d'utilisateur"),
+  email: yup.string().email().optional().label("Mot de passe"),
+  role: yup.string().optional().label("Rôle"),
+  active: yup.bool().optional().label("IsActive"),
 });
