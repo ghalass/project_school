@@ -1,9 +1,13 @@
+// src/index.js
+
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import 'core-js'
 
 import App from './App'
 import store from './store'
+
+import './i18n'
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthContextProvider } from './context/AuthContext'

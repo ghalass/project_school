@@ -14,14 +14,16 @@ import {
   CNavItem,
   useColorModes,
   CBadge,
+  CButton,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilChatBubble, cilContrast, cilMenu, cilMoon, cilSun } from '@coreui/icons'
+import { cifFr, cifSa, cilChatBubble, cilContrast, cilMenu, cilMoon, cilSun } from '@coreui/icons'
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { useAuth } from '../context/AuthContext'
 import { getUserRole } from '../utils/func'
+import useUIStore from '../stores/store'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -38,6 +40,12 @@ const AppHeader = () => {
   }, [])
 
   const { user } = useAuth()
+
+  const { lang, changeLang } = useUIStore()
+
+  const handleLanguageClick = () => {
+    lang === 'fr' ? changeLang('ar') : changeLang('fr')
+  }
 
   return (
     <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
@@ -71,10 +79,24 @@ const AppHeader = () => {
               <CIcon icon={cilChatBubble} size="lg" /> Chat
             </CNavLink>
           </CNavItem>
+
+          {/* SEPARATOR */}
           <li className="nav-item py-1">
-            <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
+            <div className="vr h-100 mx-1 text-body text-opacity-75"></div>
           </li>
-          {/*  */}
+
+          {/* LANG */}
+          <CButton className="d-flex btn gap-1" onClick={handleLanguageClick}>
+            <CIcon icon={lang === 'fr' ? cifSa : cifFr} size="lg" className="mt-1" />
+            {lang === 'fr' ? 'Arabe' : 'فرنسي'}
+          </CButton>
+
+          {/* SEPARATOR */}
+          <li className="nav-item py-1">
+            <div className="vr h-100 mx-1 text-body text-opacity-75"></div>
+          </li>
+
+          {/* LIGHT/DARK MODE */}
           <CDropdown variant="nav-item" placement="bottom-end">
             <CDropdownToggle caret={false}>
               {colorMode === 'dark' ? (
@@ -116,10 +138,10 @@ const AppHeader = () => {
             </CDropdownMenu>
           </CDropdown>
           <li className="nav-item py-1">
-            <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
+            <div className="vr h-100 mx-1 text-body text-opacity-75"></div>
           </li>
 
-          {/*  */}
+          {/* USER INFOS */}
           <div className="d-none d-md-flex">
             <div className="d-block align-content-center ">
               <div className="d-flex align-content-center gap-1">
@@ -135,11 +157,11 @@ const AppHeader = () => {
               </div>
             </div>
             <li className="nav-item py-1">
-              <div className="vr h-100 mx-2 text-body text-opacity-75"></div>
+              <div className="vr h-100 mx-1 text-body text-opacity-75"></div>
             </li>
           </div>
 
-          {/*  */}
+          {/* USER OPTIONS */}
           <AppHeaderDropdown />
         </CHeaderNav>
       </CContainer>

@@ -1,3 +1,5 @@
+// src/App.js
+
 import React, { Suspense, useEffect } from 'react'
 import { HashRouter, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { useSelector } from 'react-redux'
@@ -8,6 +10,7 @@ import './scss/style.scss'
 // We use those styles to show code examples, you should remove them in your application.
 import './scss/examples.scss'
 import { useAuth } from './context/AuthContext'
+import useUIStore from './stores/store'
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout'))
@@ -34,6 +37,13 @@ const App = () => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const { isAuthenticated, loading } = useAuth()
+
+  const { lang } = useUIStore()
+  // ✅ mettre à jour la direction du document selon la langue
+  useEffect(() => {
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+    document.documentElement.lang = lang
+  }, [lang])
 
   return (
     <HashRouter>
