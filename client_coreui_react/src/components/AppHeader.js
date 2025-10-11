@@ -3,32 +3,26 @@ import { NavLink } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
-  CDropdown,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle,
   CHeader,
   CHeaderNav,
   CHeaderToggler,
   CNavLink,
   CNavItem,
-  useColorModes,
   CBadge,
-  CButton,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cifFr, cifSa, cilChatBubble, cilContrast, cilMenu, cilMoon, cilSun } from '@coreui/icons'
+import { cilChatBubble, cilMenu } from '@coreui/icons'
 
 import { AppBreadcrumb } from './index'
 import { AppHeaderDropdown } from './header/index'
 import { useAuth } from '../context/AuthContext'
 import { getUserRole } from '../utils/func'
-import useUIStore from '../stores/store'
 import { useTranslation } from 'react-i18next'
+import ChangeLang from '../views/components/ChangeLang'
+import ChangeTheme from '../views/components/ChangeTheme'
 
 const AppHeader = () => {
   const headerRef = useRef()
-  const { colorMode, setColorMode } = useColorModes('coreui-free-react-admin-template-theme')
 
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
@@ -42,13 +36,7 @@ const AppHeader = () => {
 
   const { user } = useAuth()
 
-  const { lang, changeLang } = useUIStore()
-
   const { t } = useTranslation()
-
-  const handleLanguageClick = () => {
-    lang === 'fr' ? changeLang('ar') : changeLang('fr')
-  }
 
   return (
     <CHeader position="sticky" className="mb-4 p-0" ref={headerRef}>
@@ -84,10 +72,7 @@ const AppHeader = () => {
           </li>
 
           {/* LANG */}
-          <CButton className="d-flex btn gap-1" onClick={handleLanguageClick}>
-            <CIcon icon={lang === 'fr' ? cifSa : cifFr} size="lg" className="mt-1" />
-            {lang === 'fr' ? 'Arabe' : 'فرنسي'}
-          </CButton>
+          <ChangeLang />
 
           {/* SEPARATOR */}
           <li className="nav-item py-1">
@@ -95,46 +80,9 @@ const AppHeader = () => {
           </li>
 
           {/* LIGHT/DARK MODE */}
-          <CDropdown variant="nav-item" placement="bottom-end">
-            <CDropdownToggle caret={false}>
-              {colorMode === 'dark' ? (
-                <CIcon icon={cilMoon} size="lg" />
-              ) : colorMode === 'auto' ? (
-                <CIcon icon={cilContrast} size="lg" />
-              ) : (
-                <CIcon icon={cilSun} size="lg" />
-              )}
-            </CDropdownToggle>
-            <CDropdownMenu>
-              <CDropdownItem
-                active={colorMode === 'light'}
-                className="d-flex align-items-center"
-                as="button"
-                type="button"
-                onClick={() => setColorMode('light')}
-              >
-                <CIcon className="me-2" icon={cilSun} size="lg" /> {t('theme.light')}
-              </CDropdownItem>
-              <CDropdownItem
-                active={colorMode === 'dark'}
-                className="d-flex align-items-center"
-                as="button"
-                type="button"
-                onClick={() => setColorMode('dark')}
-              >
-                <CIcon className="me-2" icon={cilMoon} size="lg" /> {t('theme.dark')}
-              </CDropdownItem>
-              <CDropdownItem
-                active={colorMode === 'auto'}
-                className="d-flex align-items-center"
-                as="button"
-                type="button"
-                onClick={() => setColorMode('auto')}
-              >
-                <CIcon className="me-2" icon={cilContrast} size="lg" /> {t('theme.auto')}
-              </CDropdownItem>
-            </CDropdownMenu>
-          </CDropdown>
+          <ChangeTheme />
+
+          {/*  */}
           <li className="nav-item py-1">
             <div className="vr h-100 mx-1 text-body text-opacity-75"></div>
           </li>

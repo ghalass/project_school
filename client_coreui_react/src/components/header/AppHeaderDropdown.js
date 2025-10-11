@@ -24,6 +24,8 @@ const AppHeaderDropdown = () => {
   const logoutMutation = useLogoutMutation()
   const navigate = useNavigate()
   const { dispatch } = useAuthContext()
+  const { t } = useTranslation()
+
   const onLogout = (e) => {
     e.preventDefault()
     logoutMutation.mutate(
@@ -32,7 +34,7 @@ const AppHeaderDropdown = () => {
         onSuccess: (data) => {
           dispatch({ type: 'LOGOUT', payload: data?.user })
           navigate('/login')
-          toast.success('Déconnecté avec succès.')
+          toast.success(t('pages.logout.successMessage'))
         },
         onError: (err) => {
           console.log(err?.message)
@@ -41,8 +43,6 @@ const AppHeaderDropdown = () => {
       },
     )
   }
-
-  const { t } = useTranslation()
 
   return (
     <CDropdown variant="nav-item">

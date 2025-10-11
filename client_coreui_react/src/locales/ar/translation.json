@@ -31,13 +31,24 @@
     "pages": {
         "dashboard": {
             "title": "لوحة التحكم",
-            "users":"مستخدم"
+            "users": "مستخدم"
         },
         "home": {
             "title": "الرئيسية"
         },
         "users": {
             "title": "المستخدمين"
+        },
+        "profile": {
+            "title": "الملف الشخصي"
+        },
+        "login": {
+            "title": "تسجيل الدخول",
+            "message1": "قم بتسجيل الدخول إلى حسابك",
+            "successMessage": "تم تسجيل الدخول بنجاح"
+        },
+        "logout": {
+            "successMessage": "تم تسجيل الخروج بنجاح"
         }
     }
 }

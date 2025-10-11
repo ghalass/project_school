@@ -31,13 +31,21 @@
     "pages": {
         "dashboard": {
             "title": "Tableau de bord",
-            "users":"Utilisateurs"
+            "users": "Utilisateurs"
         },
         "home": {
             "title": "Principale"
         },
         "users": {
             "title": "Utilisateurs"
+        },
+        "login": {
+            "title": "Se connecter",
+            "message1": "Connectez-vous à votre compte",
+            "successMessage": "Connecté avec succès"
+        },
+        "logout": {
+            "successMessage": "Déconnecté avec succès"
         }
     }
 }
