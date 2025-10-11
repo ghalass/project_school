@@ -1,3 +1,43 @@
 {
-    "welcome":"Bienvenue"
+    "welcome": "Bienvenue",
+    "logo": "Mon école",
+    "userRole": {
+        "AGENT SAISIE": "Agent de saisie",
+        "UTILISATEUR": "Utilisateur",
+        "ADMIN": "Admin",
+        "SUPER ADMIN": "Super admin",
+        "NON ATTRIBUÉ": "Non attribué"
+    },
+    "navBar": {
+        "home": "Principale",
+        "chat": "Chat",
+        "user": {
+            "title": "Compte",
+            "profil": "Profile",
+            "login": "Se connecter",
+            "logout": "Se déconnecter"
+        }
+    },
+    "theme": {
+        "dark": "Sombre",
+        "light": "Clair",
+        "auto": "Automatique"
+    },
+    "sideBar": {
+        "dashboard": "Tableau de bord",
+        "settings": "Paramètres",
+        "users": "Utilisateurs"
+    },
+    "pages": {
+        "dashboard": {
+            "title": "Tableau de bord",
+            "users":"Utilisateurs"
+        },
+        "home": {
+            "title": "Principale"
+        },
+        "users": {
+            "title": "Utilisateurs"
+        }
+    }
 }

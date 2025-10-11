@@ -1,3 +1,43 @@
 {
-    "welcome":"مرحباً"
+    "welcome": "مرحباً",
+    "logo": "مدرستي",
+    "navBar": {
+        "home": "الرئيسية",
+        "chat": "محادثة",
+        "user": {
+            "title": "الحساب",
+            "profil": "الملف الشخصي",
+            "login": "تسجيل الدخول",
+            "logout": "تسجيل الخروج"
+        }
+    },
+    "userRole": {
+        "AGENT SAISIE": "وكيل إدخال البيانات",
+        "UTILISATEUR": "مستخدم",
+        "ADMIN": "مسؤول",
+        "SUPER ADMIN": "مشرف عام",
+        "NON ATTRIBUÉ": "غير محدد"
+    },
+    "theme": {
+        "dark": "داكن",
+        "light": "فاتح",
+        "auto": "تلقائي"
+    },
+    "sideBar": {
+        "dashboard": "لوحة التحكم",
+        "settings": "الإعدادات",
+        "users": "المستخدمين"
+    },
+    "pages": {
+        "dashboard": {
+            "title": "لوحة التحكم",
+            "users":"مستخدم"
+        },
+        "home": {
+            "title": "الرئيسية"
+        },
+        "users": {
+            "title": "المستخدمين"
+        }
+    }
 }

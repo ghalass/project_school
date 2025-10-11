@@ -18,6 +18,7 @@ import { toast } from 'react-toastify'
 import { useLogoutMutation } from '../../features/users/users.queries' // ✅ version refactorée
 
 import { useAuthContext } from '../../context/AuthContext'
+import { useTranslation } from 'react-i18next'
 
 const AppHeaderDropdown = () => {
   const logoutMutation = useLogoutMutation()
@@ -41,22 +42,26 @@ const AppHeaderDropdown = () => {
     )
   }
 
+  const { t } = useTranslation()
+
   return (
     <CDropdown variant="nav-item">
       <CDropdownToggle placement="bottom-end" className="py-0 pe-0" caret={false}>
         <CAvatar src={avatar8} size="md" />
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
-        <CDropdownHeader className="bg-body-secondary fw-semibold my-2">Settings</CDropdownHeader>
+        <CDropdownHeader className="bg-body-secondary fw-semibold my-2">
+          {t('navBar.user.title')}
+        </CDropdownHeader>
         <CDropdownItem href="#/profile">
           <CIcon icon={cilUser} className="me-2" />
-          Profile
+          {t('navBar.user.profil')}
         </CDropdownItem>
 
         <CDropdownDivider />
         <CDropdownItem as={'button'} onClick={onLogout}>
           <CIcon icon={cilLockLocked} className="me-2" />
-          Se déconnecter
+          {t('navBar.user.logout')}
         </CDropdownItem>
       </CDropdownMenu>
     </CDropdown>

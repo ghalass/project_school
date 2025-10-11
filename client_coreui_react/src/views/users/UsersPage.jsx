@@ -7,6 +7,8 @@ import TableExport from '../components/table/TableExport'
 import TablePagination from '../components/table/TablePagination'
 import { useUsersPage } from '../../features/users/useUsersPage'
 import { DEFAULT_PAGE } from '../../utils/constantes'
+import { Helmet } from 'react-helmet-async'
+import { useTranslation } from 'react-i18next'
 
 const UsersPage = () => {
   const {
@@ -33,8 +35,17 @@ const UsersPage = () => {
     op,
   } = useUsersPage()
 
+  const { t } = useTranslation()
+
   return (
     <div>
+      <Helmet>
+        <title>
+          {t('logo')} | {t('pages.users.title')}
+        </title>
+        <meta name="description" content="Bienvenue sur le tableau de bord" />
+      </Helmet>
+
       {/* Header avec titre + recherche + modal */}
       <div className="d-flex align-items-center justify-content-between gap-1 mb-2">
         <TableTitle

@@ -3,4 +3,5 @@ export const USER_TYPE = [
   { title: 'UTILISATEUR', value: 'USER' },
   { title: 'ADMIN', value: 'ADMIN' },
   { title: 'SUPER ADMIN', value: 'SUPER_ADMIN' },
+  { title: 'NON ATTRIBUÉ', value: 'NON_ATTRIBUÉ' },
 ]

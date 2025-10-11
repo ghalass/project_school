@@ -17,12 +17,19 @@ import { logo } from 'src/assets/brand/logo'
 import { sygnet } from 'src/assets/brand/sygnet'
 
 // sidebar nav config
-import navigation from '../_nav'
+// import navigation from '../_nav'
+import useNav from '../_nav'
+import { cilSchool } from '@coreui/icons'
+import { useTranslation } from 'react-i18next'
 
 const AppSidebar = () => {
+  const navigation = useNav()
+
   const dispatch = useDispatch()
   const unfoldable = useSelector((state) => state.sidebarUnfoldable)
   const sidebarShow = useSelector((state) => state.sidebarShow)
+
+  const { t } = useTranslation()
 
   return (
     <CSidebar
@@ -36,8 +43,9 @@ const AppSidebar = () => {
       }}
     >
       <CSidebarHeader className="border-bottom">
-        <CSidebarBrand to="/">
-          <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} />
+        <CSidebarBrand to="/" className="text-decoration-none">
+          <CIcon customClassName="sidebar-brand-full" icon={cilSchool} height={32} />
+          <strong className="fw-bold ms-2">{t('logo')}</strong>
           <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
         </CSidebarBrand>
         <CCloseButton

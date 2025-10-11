@@ -24,6 +24,7 @@ import { AppHeaderDropdown } from './header/index'
 import { useAuth } from '../context/AuthContext'
 import { getUserRole } from '../utils/func'
 import useUIStore from '../stores/store'
+import { useTranslation } from 'react-i18next'
 
 const AppHeader = () => {
   const headerRef = useRef()
@@ -43,6 +44,8 @@ const AppHeader = () => {
 
   const { lang, changeLang } = useUIStore()
 
+  const { t } = useTranslation()
+
   const handleLanguageClick = () => {
     lang === 'fr' ? changeLang('ar') : changeLang('fr')
   }
@@ -61,12 +64,7 @@ const AppHeader = () => {
         <CHeaderNav className="d-none d-md-flex me-auto">
           <CNavItem>
             <CNavLink to="/" as={NavLink}>
-              Home
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink to="/users" as={NavLink}>
-              Users
+              {t('navBar.home')}
             </CNavLink>
           </CNavItem>
         </CHeaderNav>
@@ -76,7 +74,7 @@ const AppHeader = () => {
         <CHeaderNav>
           <CNavItem>
             <CNavLink to="/chat" as={NavLink} className="text-success">
-              <CIcon icon={cilChatBubble} size="lg" /> Chat
+              <CIcon icon={cilChatBubble} size="lg" /> {t('navBar.chat')}
             </CNavLink>
           </CNavItem>
 
@@ -115,7 +113,7 @@ const AppHeader = () => {
                 type="button"
                 onClick={() => setColorMode('light')}
               >
-                <CIcon className="me-2" icon={cilSun} size="lg" /> Light
+                <CIcon className="me-2" icon={cilSun} size="lg" /> {t('theme.light')}
               </CDropdownItem>
               <CDropdownItem
                 active={colorMode === 'dark'}
@@ -124,7 +122,7 @@ const AppHeader = () => {
                 type="button"
                 onClick={() => setColorMode('dark')}
               >
-                <CIcon className="me-2" icon={cilMoon} size="lg" /> Dark
+                <CIcon className="me-2" icon={cilMoon} size="lg" /> {t('theme.dark')}
               </CDropdownItem>
               <CDropdownItem
                 active={colorMode === 'auto'}
@@ -133,7 +131,7 @@ const AppHeader = () => {
                 type="button"
                 onClick={() => setColorMode('auto')}
               >
-                <CIcon className="me-2" icon={cilContrast} size="lg" /> Auto
+                <CIcon className="me-2" icon={cilContrast} size="lg" /> {t('theme.auto')}
               </CDropdownItem>
             </CDropdownMenu>
           </CDropdown>
@@ -152,7 +150,7 @@ const AppHeader = () => {
                 </CBadge>
 
                 <CBadge color="info" shape="rounded-pill">
-                  <span className="text-uppercase">{getUserRole(user)}</span>
+                  <span className="text-uppercase">{t(`userRole.${getUserRole(user)}`)}</span>
                 </CBadge>
               </div>
             </div>

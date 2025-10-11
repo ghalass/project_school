@@ -1,5 +1,7 @@
 import { create } from 'zustand'
-import i18next from 'i18next'
+
+// Fonction pour récupérer la langue sauvegardée ou utiliser 'fr' par défaut
+const getInitialLang = () => localStorage.getItem('lang') || 'fr'
 
 const useUIStore = create((set) => ({
   isModalOpen: false,
@@ -9,12 +11,11 @@ const useUIStore = create((set) => ({
   closeModal: () => set({ isModalOpen: false }),
   setOp: (o) => set({ op: o }),
 
-  lang: 'ar',
-  changeLang: (l) =>
-    set(() => {
-      i18next.changeLanguage(l)
-      return { lang: l }
-    }),
+  lang: getInitialLang(),
+  changeLang: (l) => {
+    localStorage.setItem('lang', l) // Persistance
+    set({ lang: l })
+  },
 }))
 
 export default useUIStore

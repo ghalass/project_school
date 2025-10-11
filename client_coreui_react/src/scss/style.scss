@@ -4,8 +4,11 @@
 @use "@coreui/chartjs/scss/coreui-chartjs";
 @use "vendors/simplebar";
 
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Cairo:wght@400;700&display=swap');
+
 body {
   background-color: var(--cui-tertiary-bg);
+  font-family: 'Roboto', 'Cairo', sans-serif;
 }
 
 .wrapper {
