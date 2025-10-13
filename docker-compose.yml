@@ -18,7 +18,7 @@ services:
       - my_school_net
 
   backend_my_school:
-    image: ghalass/my_school_backend:latest
+    image: my_school_backend:latest
     container_name: backend_my_school
     restart: always
     environment:
@@ -34,7 +34,7 @@ services:
       # - proxy
 
   frontend_my_school:
-    image: ghalass/my_school_frontend:latest
+    image: my_school_frontend:latest
     container_name: frontend_my_school
     restart: always
     depends_on:
