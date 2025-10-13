@@ -50,6 +50,8 @@ services:
       VIRTUAL_HOST: school.ghalass.com
       LETSENCRYPT_HOST: school.ghalass.com
       VIRTUAL_PORT: 80
+    ports:
+      - "80:80"
 
 volumes:
   db_my_school_data:
