@@ -9,9 +9,8 @@ RUN npm install --production
 
 COPY . .
 
-# Génère Prisma Client
+# Génération Prisma Client
 RUN npx prisma generate
 
 EXPOSE 5001
-
 CMD ["npm", "start"]

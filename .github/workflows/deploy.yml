@@ -10,32 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout du code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Connexion à Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3️⃣ Build backend (Express + Prisma)
       - name: Build backend image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest ./server_expressjs
 
-      # 4️⃣ Build frontend (React + Nginx)
       - name: Build frontend image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest ./client_coreui_react
 
-      # 5️⃣ Push images sur Docker Hub
       - name: Push images
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
-      # 6️⃣ Copier docker-compose.yml sur le VPS
       - name: Copy docker-compose.yml to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -45,7 +39,6 @@ jobs:
           source: "docker-compose.yml"
           target: "/root/my_school/"
 
-      # 7️⃣ Déployer sur le VPS et créer le .env avec les secrets
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -54,27 +47,16 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: 22
           script: |
-            # Créer le dossier du projet si inexistant
             mkdir -p /root/my_school
             cd /root/my_school
 
-            # 🔑 Créer le fichier .env avec les secrets
-            cat > .env <<EOF
-            DATABASE_URL=mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db
-            NODE_ENV=production
-            PORT=5001
-            ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}
-            EOF
+            echo "DATABASE_URL=mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db" > .env
+            echo "NODE_ENV=production" >> .env
+            echo "PORT=5001" >> .env
+            echo "ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}" >> .env
 
-            # Arrêter les anciens conteneurs
             docker-compose down || true
-
-            # Télécharger les nouvelles images
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
-
-            # Créer le réseau proxy s'il n'existe pas
             docker network inspect proxy >/dev/null 2>&1 || docker network create proxy
-
-            # Démarrer les conteneurs
             docker-compose up -d
