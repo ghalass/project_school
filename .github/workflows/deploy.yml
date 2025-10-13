@@ -28,7 +28,13 @@ jobs:
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest ./server_expressjs
 
       - name: Build frontend image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest ./client_coreui_react
+        run: |
+          # Crée un .env temporaire pour le build frontend
+          echo "VITE_BASE_URL=http://school.ghalass.com" > ./client_coreui_react/.env
+          echo "VITE_NODE_ENV=production" >> ./client_coreui_react/.env
+
+          # Build de l'image frontend avec le .env injecté
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest ./client_coreui_react
 
       # 4️⃣ Push des images sur Docker Hub
       - name: Push images
@@ -63,7 +69,7 @@ jobs:
             echo "DATABASE_URL=mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db" > .env
             echo "NODE_ENV=production" >> .env
             echo "PORT=5001" >> .env
-            echo "URL=http://school.ghalass.com/" >> .env
+            echo "URL=http://localhost" >> .env
             echo "TOKEN_EXPIRE_IN=7h" >> .env
             echo "ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}" >> .env
 
