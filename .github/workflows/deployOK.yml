@@ -12,31 +12,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Récupération du code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Connexion à Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # 3️⃣ Build des images Docker
       - name: Build backend image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest ./server_expressjs
 
       - name: Build frontend image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest ./client_coreui_react
 
-      # 4️⃣ Push des images sur Docker Hub
       - name: Push images
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
-      # 5️⃣ Copier docker-compose.yml vers le VPS
       - name: Copy docker-compose.yml to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -46,7 +41,6 @@ jobs:
           source: "docker-compose.yml"
           target: "/root/my_school/"
 
-      # 6️⃣ Déploiement sur le VPS
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -55,52 +49,21 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           port: 22
           script: |
-            set -e
             mkdir -p /root/my_school
             cd /root/my_school
 
-            echo "=== 📦 Création du fichier .env ==="
             echo "DATABASE_URL=mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db" > .env
             echo "NODE_ENV=production" >> .env
             echo "PORT=5001" >> .env
             echo "URL=http://localhost" >> .env
-            echo "TOKEN_EXPIRE_IN=7h" >> .env
+            echo "TOKEN_EXPIRE_IN="7h"" >> .env
             echo "ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}" >> .env
 
-            echo "=== 🔄 Mise à jour des images ==="
             docker-compose down || true
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
-            echo "=== 🌐 Vérification du réseau nginx-proxy ==="
+            # Créer le réseau nginx-proxy si nécessaire
             docker network inspect nginx-proxy >/dev/null 2>&1 || docker network create nginx-proxy
 
-            echo "=== 🚀 Démarrage du proxy si nécessaire ==="
-            if [ -z "$(docker ps -q -f name=nginx-proxy)" ]; then
-              docker run -d \
-                --name nginx-proxy \
-                --network nginx-proxy \
-                -p 80:80 -p 443:443 \
-                -v /var/run/docker.sock:/tmp/docker.sock:ro \
-                -v /etc/nginx/certs:/etc/nginx/certs:ro \
-                -v /etc/nginx/vhost.d \
-                -v /usr/share/nginx/html \
-                jwilder/nginx-proxy
-            fi
-
-            if [ -z "$(docker ps -q -f name=nginx-proxy-le)" ]; then
-              docker run -d \
-                --name nginx-proxy-le \
-                --network nginx-proxy \
-                -v /var/run/docker.sock:/var/run/docker.sock:ro \
-                -v /etc/nginx/certs:/etc/nginx/certs \
-                -v /etc/nginx/vhost.d:/etc/nginx/vhost.d \
-                -v /usr/share/nginx/html:/usr/share/nginx/html \
-                -e DEFAULT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }} \
-                nginxproxy/acme-companion
-            fi
-
-            echo "=== 🧩 Lancement des conteneurs de l'app ==="
             docker-compose up -d
-
-            echo "=== ✅ Déploiement terminé avec succès ==="
