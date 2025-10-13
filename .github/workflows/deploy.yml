@@ -37,8 +37,18 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
-            cd /root/my_school || mkdir /root/my_school && cd /root/my_school
+            # Aller dans le dossier du projet ou le créer si inexistant
+            if [ ! -d /root/my_school ]; then
+              mkdir -p /root/my_school
+            fi
+            cd /root/my_school
+
+            # Arrêter les anciens conteneurs si présents
             docker compose down || true
+
+            # Télécharger les nouvelles images
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
+
+            # Démarrer les conteneurs
             docker compose up -d
