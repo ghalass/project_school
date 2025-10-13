@@ -18,7 +18,7 @@ services:
       - my_school_net
 
   backend_my_school:
-    image: $DOCKERHUB_USERNAME/my_school_backend:latest
+    image: ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
     container_name: backend_my_school
     restart: always
     environment:
@@ -34,7 +34,7 @@ services:
       # - proxy
 
   frontend_my_school:
-    image: $DOCKERHUB_USERNAME/my_school_frontend:latest
+    image: ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
     container_name: frontend_my_school
     restart: always
     depends_on:
@@ -55,5 +55,5 @@ volumes:
 networks:
   my_school_net:
     driver: bridge
-  proxy:
-    external: true
+  # proxy:
+  #   external: true
