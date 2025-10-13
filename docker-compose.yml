@@ -1,5 +1,4 @@
 # docker-compose.yml for My School Application
-#
 version: "3.9"
 
 services:
@@ -42,14 +41,14 @@ services:
     restart: always
     depends_on:
       - backend_my_school
-    ports: [] # ne rien exposer directement, le proxy gère le port 80
+    ports: [] # pas d'exposition directe, le proxy gère le port 80
     networks:
       - my_school_net
-      - nginx-proxy # <- ajouté pour que le proxy le voie
+      - nginx-proxy # nécessaire pour que le proxy LE détecte le service
     environment:
       VIRTUAL_HOST: school.ghalass.com
       LETSENCRYPT_HOST: school.ghalass.com
-      VIRTUAL_PORT: 8080 # car tu exposes 8080 sur le VPS
+      VIRTUAL_PORT: 8080 # frontend écoute sur 8080 localement
 
 volumes:
   db_my_school_data:
@@ -57,3 +56,5 @@ volumes:
 networks:
   my_school_net:
     driver: bridge
+  nginx-proxy:
+    external: true # Docker n’essaie pas de créer le réseau, il doit déjà exister
