@@ -1,0 +1,44 @@
+name: Deploy my_school App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build backend image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest ./backend
+
+      - name: Build frontend image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest ./frontend
+
+      - name: Push images to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          script: |
+            cd /root/my_school || mkdir /root/my_school && cd /root/my_school
+            docker compose down || true
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
+            docker compose up -d

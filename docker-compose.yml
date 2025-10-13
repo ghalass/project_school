@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  db_my_school:
+    image: mysql:8
+    container_name: db_my_school
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: my_school_db
+      MYSQL_USER: my_school_user
+      MYSQL_PASSWORD: my_school_pass
+    volumes:
+      - db_my_school_data:/var/lib/mysql
+    networks:
+      - my_school_net
+
+  backend_my_school:
+    image: ghalass/my_school_backend:latest
+    container_name: backend_my_school
+    restart: always
+    environment:
+      DATABASE_URL: mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db
+      NODE_ENV: production
+      PORT: 5001
+    depends_on:
+      - db_my_school
+    expose:
+      - "5001"
+    networks:
+      - my_school_net
+      - proxy
+
+  frontend_my_school:
+    image: ghalass/my_school_frontend:latest
+    container_name: frontend_my_school
+    restart: always
+    expose:
+      - "80"
+    networks:
+      - my_school_net
+      - proxy
+    environment:
+      VIRTUAL_HOST: school.ghalass.com
+      LETSENCRYPT_HOST: school.ghalass.com
+      VIRTUAL_PORT: 80
+
+volumes:
+  db_my_school_data:
+
+networks:
+  my_school_net:
+    driver: bridge
+  proxy:
+    external: true
