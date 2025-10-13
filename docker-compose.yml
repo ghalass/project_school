@@ -42,14 +42,14 @@ services:
     restart: always
     depends_on:
       - backend_my_school
-    ports:
-      - "127.0.0.1:8080:80" # expose seulement localement sur le VPS
+    ports: [] # ne rien exposer directement, le proxy gère le port 80
     networks:
       - my_school_net
+      - nginx-proxy # <- ajouté pour que le proxy le voie
     environment:
       VIRTUAL_HOST: school.ghalass.com
       LETSENCRYPT_HOST: school.ghalass.com
-      VIRTUAL_PORT: 8080
+      VIRTUAL_PORT: 8080 # car tu exposes 8080 sur le VPS
 
 volumes:
   db_my_school_data:
