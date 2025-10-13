@@ -16,15 +16,21 @@ services:
       - db_my_school_data:/var/lib/mysql
     networks:
       - my_school_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   backend_my_school:
     image: ghalass/my_school_backend:latest
     container_name: backend_my_school
     restart: always
     env_file:
-      - .env # 🔑 Les variables d'environnement sont chargées depuis le .env sur le VPS
+      - .env
     depends_on:
-      - db_my_school
+      db_my_school:
+        condition: service_healthy
     expose:
       - "5001"
     networks:
