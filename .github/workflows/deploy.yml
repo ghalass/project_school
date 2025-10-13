@@ -44,11 +44,11 @@ jobs:
             cd /root/my_school
 
             # Arrêter les anciens conteneurs si présents
-            docker compose down || true
+            docker-compose down || true
 
             # Télécharger les nouvelles images
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
             docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
             # Démarrer les conteneurs
-            docker compose up -d
+            docker-compose up -d
