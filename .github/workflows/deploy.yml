@@ -1,4 +1,5 @@
-name: Deploy my_school App
+# .github/workflows/deploy.yml
+name: Deploy My School App
 
 on:
   push:
@@ -10,26 +11,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Récupérer le code depuis le repository
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2️⃣ Connexion à Docker Hub pour pouvoir push/pull des images
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      # 3️⃣ Construire l'image backend (Express + Prisma)
       - name: Build backend image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest ./server_expressjs
 
+      # 4️⃣ Construire l'image frontend (React + Nginx)
       - name: Build frontend image
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest ./client_coreui_react
 
+      # 5️⃣ Pousser les images sur Docker Hub
       - name: Push images to Docker Hub
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
+      # 6️⃣ Copier le docker-compose.yml sur le VPS
       - name: Copy docker-compose.yml to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -39,28 +46,28 @@ jobs:
           source: "docker-compose.yml"
           target: "/root/my_school/"
 
+      # 7️⃣ Déployer sur le VPS
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           password: ${{ secrets.VPS_PASSWORD }}
+          port: 22
           script: |
             # Aller dans le dossier du projet ou le créer si inexistant
-            if [ ! -d /***/my_school ]; then
-              mkdir -p /***/my_school
-            fi
-            cd /***/my_school
+            mkdir -p /root/my_school
+            cd /root/my_school
 
             # Arrêter les anciens conteneurs si présents
             docker-compose down || true
 
             # Télécharger les nouvelles images
-            docker pull ***/my_school_backend:latest
-            docker pull ***/my_school_frontend:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
-            # Créer le réseau proxy s'il n'existe pas
+            # Créer le réseau proxy s'il n'existe pas (HTTPS automatique via nginx-proxy)
             docker network inspect proxy >/dev/null 2>&1 || docker network create proxy
 
-            # Démarrer les conteneurs
+            # Démarrer les conteneurs avec docker-compose
             docker-compose up -d

@@ -1,3 +1,5 @@
+# Dockerfile for React application (client_coreui_react/Dockerfile)
+
 FROM node:22.12.0 as build
 
 WORKDIR /app

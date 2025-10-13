@@ -1,3 +1,5 @@
+# Dockerfile for Express.js server with Prisma (server_expressjs/Dockerfile)
+
 FROM node:22.12.0
 
 WORKDIR /app
