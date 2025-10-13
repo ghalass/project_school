@@ -30,7 +30,7 @@ jobs:
       - name: Build frontend image
         run: |
           # Crée un .env temporaire pour le build frontend
-          echo "VITE_BASE_URL=http://school.ghalass.com" > ./client_coreui_react/.env
+          echo "VITE_BASE_URL=http://school.ghalass.com/api" > ./client_coreui_react/.env
           echo "VITE_NODE_ENV=production" >> ./client_coreui_react/.env
 
           # Build de l'image frontend avec le .env injecté
