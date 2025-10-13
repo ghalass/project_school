@@ -48,7 +48,7 @@ services:
     environment:
       VIRTUAL_HOST: school.ghalass.com
       LETSENCRYPT_HOST: school.ghalass.com
-      VIRTUAL_PORT: 8080 # frontend écoute sur 8080 localement
+      VIRTUAL_PORT: 80 # ✅ au lieu de 8080
 
 volumes:
   db_my_school_data:
