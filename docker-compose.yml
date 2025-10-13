@@ -42,16 +42,14 @@ services:
     restart: always
     depends_on:
       - backend_my_school
-    expose:
-      - "80"
+    ports:
+      - "127.0.0.1:8080:80" # expose seulement localement sur le VPS
     networks:
       - my_school_net
     environment:
       VIRTUAL_HOST: school.ghalass.com
       LETSENCRYPT_HOST: school.ghalass.com
-      VIRTUAL_PORT: 80
-    ports:
-      - "80:80"
+      VIRTUAL_PORT: 8080
 
 volumes:
   db_my_school_data:
