@@ -31,17 +31,19 @@ services:
       - "5001"
     networks:
       - my_school_net
-      - proxy
+      # - proxy
 
   frontend_my_school:
     image: ghalass/my_school_frontend:latest
     container_name: frontend_my_school
     restart: always
+    depends_on:
+      - backend_my_school
     expose:
       - "80"
     networks:
       - my_school_net
-      - proxy
+      # - proxy
     environment:
       VIRTUAL_HOST: school.ghalass.com
       LETSENCRYPT_HOST: school.ghalass.com
