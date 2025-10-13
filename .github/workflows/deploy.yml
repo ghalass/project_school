@@ -30,6 +30,15 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
+      - name: Copy docker-compose.yml to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          source: "docker-compose.yml"
+          target: "/root/my_school/"
+
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
