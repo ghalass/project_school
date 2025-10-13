@@ -1,12 +1,25 @@
-#!/bin/sh
-# wait-for-db.sh : attend que la DB MySQL soit prête avant de démarrer le serveur
+#!/bin/bash
+# wait-for-db.sh
 
-echo "Waiting for MySQL at db_my_school:3306..."
+set -e
 
-until nc -z db_my_school 3306; do
-  echo "MySQL not ready, waiting 2s..."
+host="$1"
+shift
+cmd="$@"
+
+echo "⏳ Waiting for database at $host..."
+
+# Boucle jusqu'à ce que la DB réponde
+until nc -z -v -w30 $(echo $host | cut -d/ -f3 | cut -d: -f1) $(echo $host | cut -d: -f2); do
+  echo "⏱ Database not ready yet..."
   sleep 2
 done
 
-echo "MySQL is up! Starting backend..."
-exec "$@"
+echo "✅ Database is up!"
+
+# Appliquer les migrations Prisma
+echo "🔄 Running Prisma migrations..."
+npx prisma migrate deploy
+
+# Lancer le serveur
+exec $cmd
