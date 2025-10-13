@@ -12,7 +12,6 @@ async function main() {
         password: faker.internet.password({ length: 12 }), // plus sécurisé
         role: UserRoleType.USER,
         active: true,
-        lastVisite: faker.date.recent(),
       },
     });
   }
