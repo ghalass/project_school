@@ -47,17 +47,20 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           script: |
             # Aller dans le dossier du projet ou le créer si inexistant
-            if [ ! -d /root/my_school ]; then
-              mkdir -p /root/my_school
+            if [ ! -d /***/my_school ]; then
+              mkdir -p /***/my_school
             fi
-            cd /root/my_school
+            cd /***/my_school
 
             # Arrêter les anciens conteneurs si présents
             docker-compose down || true
 
             # Télécharger les nouvelles images
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
+            docker pull ***/my_school_backend:latest
+            docker pull ***/my_school_frontend:latest
+
+            # Créer le réseau proxy s'il n'existe pas
+            docker network inspect proxy >/dev/null 2>&1 || docker network create proxy
 
             # Démarrer les conteneurs
             docker-compose up -d
