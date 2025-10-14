@@ -84,6 +84,7 @@ jobs:
             echo "URL=https://school.ghalass.com" >> .env
             echo "TOKEN_EXPIRE_IN=7h" >> .env
             echo "LETSENCRYPT_EMAIL=msghalas@gmail.com" >> .env
+            echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
             echo "ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}" >> .env
 
             echo "=== 🔧 Installation de Certbot si nécessaire ==="
