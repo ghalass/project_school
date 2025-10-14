@@ -1,58 +1,132 @@
-name: Deploy to VPS
-uses: appleboy/ssh-action@v1.2.0
-with:
-  host: ${{ secrets.VPS_HOST }}
-  username: ${{ secrets.VPS_USER }}
-  password: ${{ secrets.VPS_PASSWORD }}
-  port: 22
-  script: |
-    set -e
-    mkdir -p /root/my_school
-    cd /root/my_school
 
-    echo "=== 📦 Création du fichier .env ==="
-    echo "DATABASE_URL=mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db" > .env
-    echo "NODE_ENV=production" >> .env
-    echo "PORT=5001" >> .env
-    echo "URL=http://localhost" >> .env
-    echo "TOKEN_EXPIRE_IN=7h" >> .env
-    echo "ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}" >> .env
+# # .github/workflows/deploy.yml
 
-    echo "=== 🔄 Mise à jour des images ==="
-    docker-compose down || true
-    docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
-    docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
+name: Deploy My School App
 
-    echo "=== 🌐 Vérification du réseau nginx-proxy ==="
-    docker network inspect nginx-proxy >/dev/null 2>&1 || docker network create nginx-proxy
+on:
+  push:
+    branches:
+      - main
 
-    echo "=== 🚀 Démarrage du proxy si nécessaire ==="
-    if [ -z "$(docker ps -q -f name=nginx-proxy)" ]; then
-      docker run -d \
-        --name nginx-proxy \
-        --network nginx-proxy \
-        -p 80:80 -p 443:443 \
-        -v /var/run/docker.sock:/tmp/docker.sock:ro \
-        -v /etc/nginx/certs:/etc/nginx/certs \
-        -v /etc/nginx/vhost.d \
-        -v /usr/share/nginx/html \
-        jwilder/nginx-proxy
-    fi
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
 
-    echo "=== 🔐 Installation de Certbot si nécessaire ==="
-    if ! command -v certbot >/dev/null 2>&1; then
-      apt-get update -y
-      apt-get install -y certbot python3-certbot-nginx
-    fi
+    steps:
+      # 1️⃣ Récupération du code
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    echo "=== 📜 Vérification du certificat SSL ==="
-    if [ ! -d "/etc/letsencrypt/live/school.ghalass.com" ]; then
-      certbot --nginx --non-interactive --agree-tos -m admin@ghalass.com \
-        -d school.ghalass.com -d api.school.ghalass.com
-    else
-      echo "Certificat SSL déjà présent, vérification du renouvellement..."
-      certbot renew --quiet
-    fi
+      # 2️⃣ Connexion à Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-    echo "=== 🧩 Démarrage du stack my_school ==="
-    docker-compose up -d
+      # 3️⃣ Build des images Docker
+      - name: Build backend image
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest ./server_expressjs
+
+      - name: Build frontend image
+        run: |
+          # Crée un .env temporaire pour le build frontend
+          echo "VITE_BASE_URL=https://api.school.ghalass.com" > ./client_coreui_react/.env
+          echo "VITE_NODE_ENV=production" >> ./client_coreui_react/.env
+
+          # Build de l'image frontend avec le .env injecté
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest ./client_coreui_react
+
+      # 4️⃣ Push des images sur Docker Hub
+      - name: Push images
+        run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
+
+      # 5️⃣ Copier docker-compose.yml vers le VPS
+      - name: Copy docker-compose.yml to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          source: "docker-compose.yml"
+          target: "/root/my_school/"
+
+      # 6️⃣ Déploiement sur le VPS
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: 22
+          script: |
+            set -e
+            mkdir -p /root/my_school
+            cd /root/my_school
+
+            echo "=== 📦 Création du fichier .env ==="
+            echo "DATABASE_URL=mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db" > .env
+            echo "NODE_ENV=production" >> .env
+            echo "PORT=5001" >> .env
+            echo "URL=https://api.school.ghalass.com" >> .env
+            echo "TOKEN_EXPIRE_IN=7h" >> .env
+            echo "ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}" >> .env
+
+            echo "=== 🔄 Mise à jour des images ==="
+            docker-compose down || true
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
+
+            echo "=== 🌐 Vérification du réseau nginx-proxy ==="
+            docker network inspect nginx-proxy >/dev/null 2>&1 || docker network create nginx-proxy
+
+            echo "=== 🚀 Démarrage du proxy si nécessaire ==="
+            if [ -z "$(docker ps -q -f name=nginx-proxy)" ]; then
+              docker run -d \
+                --name nginx-proxy \
+                --network nginx-proxy \
+                -p 80:80 -p 443:443 \
+                -v /var/run/docker.sock:/tmp/docker.sock:ro \
+                -v /etc/nginx/certs:/etc/nginx/certs \
+                -v /etc/nginx/vhost.d \
+                -v /usr/share/nginx/html \
+                jwilder/nginx-proxy
+            fi
+
+            if [ -z "$(docker ps -q -f name=nginx-proxy-le)" ]; then
+              docker run -d \
+                --name nginx-proxy-le \
+                --network nginx-proxy \
+                -v /var/run/docker.sock:/var/run/docker.sock:ro \
+                -v /etc/nginx/certs:/etc/nginx/certs \
+                -v /etc/nginx/vhost.d:/etc/nginx/vhost.d \
+                -v /usr/share/nginx/html:/usr/share/nginx/html \
+                -e DEFAULT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }} \
+                nginxproxy/acme-companion
+            fi
+
+            echo "=== 🔐 Vérification de Certbot sur le VPS ==="
+            if ! command -v certbot >/dev/null 2>&1; then
+              echo "➡️ Installation de Certbot..."
+              apt-get update -y
+              apt-get install -y certbot python3-certbot-nginx
+            else
+              echo "✔️ Certbot déjà installé."
+            fi
+
+            echo "=== 🧾 Vérification ou création des certificats ==="
+            if [ ! -d "/etc/letsencrypt/live/school.ghalass.com" ]; then
+              echo "➡️ Génération du certificat SSL initial..."
+              certbot --nginx --non-interactive --agree-tos -m ${{ secrets.LETSENCRYPT_EMAIL }} \
+                -d school.ghalass.com -d api.school.ghalass.com
+            else
+              echo "➡️ Certificat déjà présent, renouvellement silencieux..."
+              certbot renew --quiet
+            fi
+
+            echo "=== 🧩 Lancement des conteneurs de l'app ==="
+            docker-compose up -d
+
+            echo "=== ✅ Déploiement terminé avec succès ==="
