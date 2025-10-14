@@ -116,29 +116,6 @@ jobs:
             sudo docker rm -f nginx-proxy || true
             sudo docker rm -f nginx-proxy-le || true
 
-            echo "=== 🚀 Démarrage du proxy nginx ==="
-            sudo docker run -d \
-              --name nginx-proxy \
-              --network nginx-proxy \
-              -p 80:80 -p 443:443 \
-              -v /var/run/docker.sock:/tmp/docker.sock:ro \
-              -v /etc/nginx/certs:/etc/nginx/certs \
-              -v /etc/nginx/vhost.d \
-              -v /usr/share/nginx/html \
-              -e FORCE_SSL=true \
-              jwilder/nginx-proxy
-
-            echo "=== 🔐 Démarrage du companion Let's Encrypt ==="
-            sudo docker run -d \
-              --name nginx-proxy-le \
-              --network nginx-proxy \
-              -v /var/run/docker.sock:/var/run/docker.sock:ro \
-              -v /etc/nginx/certs:/etc/nginx/certs \
-              -v /etc/nginx/vhost.d:/etc/nginx/vhost.d \
-              -v /usr/share/nginx/html:/usr/share/nginx/html \
-              -e DEFAULT_EMAIL=$CERT_EMAIL \
-              nginxproxy/acme-companion
-
             echo "=== 🔄 Mise à jour des images ==="
             sudo docker-compose down || true
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest

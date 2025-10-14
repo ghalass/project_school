@@ -2,60 +2,19 @@
 
 version: "3.9"
 
-services:
-  # 🟢 BACKEND (Express + Prisma)
-  backend:
-    image: ghalass/my_school_backend:latest
-    container_name: my_school_backend
-    restart: always
-    env_file:
-      - .env
-    expose:
-      - "5001"
-    environment:
-      - VIRTUAL_HOST=api.school.ghalass.com
-      - LETSENCRYPT_HOST=api.school.ghalass.com
-      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
-      - FORCE_SSL=true
-    networks:
-      - nginx-proxy
-      - internal
-    depends_on:
-      - db
-
-  # 🟣 FRONTEND (React + CoreUI)
-  frontend:
-    image: ghalass/my_school_frontend:latest
-    container_name: my_school_frontend
-    restart: always
-    expose:
-      - "3001"
-    environment:
-      - VIRTUAL_HOST=school.ghalass.com
-      - LETSENCRYPT_HOST=school.ghalass.com
-      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
-      - FORCE_SSL=true
-    networks:
-      - nginx-proxy
-
-  # 🟡 BASE DE DONNÉES
-  db:
-    image: mysql:8.0
-    container_name: db_my_school
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: my_school_db
-      MYSQL_USER: my_school_user
-      MYSQL_PASSWORD: my_school_pass
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - internal
-
-  # 🌐 REVERSE PROXY (Nginx Proxy)
+networks:
   nginx-proxy:
-    image: jwilder/nginx-proxy
+    external: true
+  my_school_net:
+    driver: bridge
+
+volumes:
+  db_my_school_data:
+
+services:
+  # 🌐 Reverse proxy principal
+  nginx-proxy:
+    image: jwilder/nginx-proxy:latest
     container_name: nginx-proxy
     restart: always
     ports:
@@ -64,35 +23,77 @@ services:
     volumes:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - /etc/nginx/certs:/etc/nginx/certs
-      - /etc/nginx/vhost.d
-      - /usr/share/nginx/html
-    networks:
-      - nginx-proxy
-
-  # 🔐 CERTIFICATS SSL (Let's Encrypt Companion)
-  nginx-proxy-le:
-    image: nginxproxy/acme-companion
-    container_name: nginx-proxy-le
-    restart: always
-    environment:
-      - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
-    depends_on:
-      - nginx-proxy
-    volumes_from:
-      - nginx-proxy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /etc/nginx/certs:/etc/nginx/certs
       - /etc/nginx/vhost.d:/etc/nginx/vhost.d
       - /usr/share/nginx/html:/usr/share/nginx/html
     networks:
       - nginx-proxy
 
-volumes:
-  mysql_data:
+  # 🔐 Certificat SSL automatique
+  nginx-proxy-le:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-le
+    restart: always
+    depends_on:
+      - nginx-proxy
+    environment:
+      - DEFAULT_EMAIL=${LETSENCRYPT_EMAIL}
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/nginx/certs:/etc/nginx/certs:rw
+      - /etc/nginx/vhost.d:/etc/nginx/vhost.d
+      - /usr/share/nginx/html:/usr/share/nginx/html
+    networks:
+      - nginx-proxy
 
-networks:
-  nginx-proxy:
-    external: true
-  internal:
-    driver: bridge
+  # 🗄️ Base de données MySQL
+  db_my_school:
+    image: mysql:8
+    container_name: db_my_school
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: my_school_db
+      MYSQL_USER: my_school_user
+      MYSQL_PASSWORD: my_school_pass
+    volumes:
+      - db_my_school_data:/var/lib/mysql
+    networks:
+      - my_school_net
+
+  # ⚙️ Backend ExpressJS
+  my_school_backend:
+    image: ${DOCKERHUB_USERNAME}/my_school_backend:latest
+    container_name: my_school_backend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db
+      - VIRTUAL_HOST=api.school.ghalass.com
+      - LETSENCRYPT_HOST=api.school.ghalass.com
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - PORT=5001
+    depends_on:
+      - db_my_school
+    expose:
+      - "5001"
+    networks:
+      - my_school_net
+      - nginx-proxy
+
+  # 🎨 Frontend React (Vite)
+  my_school_frontend:
+    image: ${DOCKERHUB_USERNAME}/my_school_frontend:latest
+    container_name: my_school_frontend
+    restart: always
+    environment:
+      - VIRTUAL_HOST=school.ghalass.com
+      - LETSENCRYPT_HOST=school.ghalass.com
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+    expose:
+      - "80"
+    networks:
+      - nginx-proxy
