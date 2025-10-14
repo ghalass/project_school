@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Récupération du code source
+      # 1️⃣ Checkout du code
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -31,7 +31,7 @@ jobs:
           echo "VITE_NODE_ENV=production" >> ./client_coreui_react/.env
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest ./client_coreui_react
 
-      # 4️⃣ Push des images sur Docker Hub
+      # 4️⃣ Push des images
       - name: Push images
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
@@ -47,7 +47,7 @@ jobs:
           source: "docker-compose.yml"
           target: "/root/my_school/"
 
-      # 6️⃣ Déploiement sur le VPS (avec nettoyage, proxy, certbot)
+      # 6️⃣ Déploiement sur VPS
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -62,10 +62,12 @@ jobs:
             sudo mkdir -p /root/my_school
             cd /root/my_school
 
-            echo "=== 🧹 Nettoyage du système Docker et des proxies existants ==="
+            echo "=== 🧹 Nettoyage Docker et suppression anciens conteneurs ==="
+            # Stop tous les conteneurs actifs
             sudo docker stop $(sudo docker ps -q) || true
             sudo docker system prune -af --volumes || true
 
+            # Supprimer nginx-proxy et companion si existent
             for c in nginx-proxy nginx-proxy-le; do
               if [ "$(sudo docker ps -aq -f name=$c)" ]; then
                 echo "➡️ Suppression du conteneur $c..."
@@ -82,9 +84,28 @@ jobs:
             echo "LETSENCRYPT_EMAIL=msghalas@gmail.com" >> .env
             echo "ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}" >> .env
 
-            echo "=== 🔄 Pull des images ==="
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
+            echo "=== 🔧 Installation de Certbot si nécessaire ==="
+            if ! command -v certbot >/dev/null 2>&1; then
+              sudo apt-get update -y
+              sudo apt-get install -y certbot
+            fi
+
+            echo "=== 🧾 Génération certificat SSL (standalone) ==="
+            CERT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
+            if [ -z "$CERT_EMAIL" ]; then
+              CERT_EMAIL="admin@ghalass.com"
+              echo "⚠️ Aucun e-mail défini dans GitHub Secrets, utilisation de $CERT_EMAIL"
+            fi
+
+            if [ ! -d "/etc/letsencrypt/live/school.ghalass.com" ]; then
+              echo "➡️ Génération du certificat initial en standalone..."
+              sudo certbot certonly --standalone --non-interactive --agree-tos \
+                -m "$CERT_EMAIL" \
+                -d school.ghalass.com -d api.school.ghalass.com || true
+            else
+              echo "➡️ Renouvellement automatique du certificat..."
+              sudo certbot renew --quiet || true
+            fi
 
             echo "=== 🌐 Vérification du réseau nginx-proxy ==="
             sudo docker network inspect nginx-proxy >/dev/null 2>&1 || sudo docker network create nginx-proxy
@@ -109,34 +130,15 @@ jobs:
               -v /etc/nginx/certs:/etc/nginx/certs \
               -v /etc/nginx/vhost.d:/etc/nginx/vhost.d \
               -v /usr/share/nginx/html:/usr/share/nginx/html \
-              -e DEFAULT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }} \
+              -e DEFAULT_EMAIL=$CERT_EMAIL \
               nginxproxy/acme-companion
 
-            echo "=== 🔧 Installation de Certbot si nécessaire ==="
-            if ! command -v certbot >/dev/null 2>&1; then
-              sudo apt-get update -y
-              sudo apt-get install -y certbot python3-certbot-nginx
-            fi
-
-            echo "=== 🧾 Vérification ou génération du certificat SSL ==="
-            CERT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
-            if [ -z "$CERT_EMAIL" ]; then
-              CERT_EMAIL="admin@ghalass.com"
-              echo "⚠️ Aucun e-mail défini dans GitHub Secrets, utilisation de $CERT_EMAIL"
-            fi
-
-            if [ ! -d "/etc/letsencrypt/live/school.ghalass.com" ]; then
-              echo "➡️ Génération du certificat initial en mode standalone..."
-              sudo certbot certonly --standalone --non-interactive --agree-tos \
-                -m "$CERT_EMAIL" \
-                -d school.ghalass.com -d api.school.ghalass.com || true
-            else
-              echo "➡️ Renouvellement automatique du certificat..."
-              sudo certbot renew --quiet || true
-            fi
+            echo "=== 🔄 Mise à jour des images ==="
+            sudo docker-compose down || true
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
             echo "=== 🧱 Lancement des conteneurs d'application ==="
-            sudo docker-compose down || true
             sudo docker-compose up -d
 
             echo "=== ✅ Déploiement terminé avec succès ==="
