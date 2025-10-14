@@ -63,11 +63,13 @@ jobs:
             cd /root/my_school
 
             echo "=== 🧹 Nettoyage Docker et suppression anciens conteneurs ==="
-            # Stop tous les conteneurs actifs
             sudo docker stop $(sudo docker ps -q) || true
             sudo docker system prune -af --volumes || true
 
-            # Supprimer nginx-proxy et companion si existent
+            # 🔧 Désactiver restart pour éviter le redémarrage auto
+            sudo docker update --restart=no nginx-proxy nginx-proxy-le || true
+
+            # Supprimer nginx-proxy et companion s’ils existent
             for c in nginx-proxy nginx-proxy-le; do
               if [ "$(sudo docker ps -aq -f name=$c)" ]; then
                 echo "➡️ Suppression du conteneur $c..."
@@ -109,6 +111,10 @@ jobs:
 
             echo "=== 🌐 Vérification du réseau nginx-proxy ==="
             sudo docker network inspect nginx-proxy >/dev/null 2>&1 || sudo docker network create nginx-proxy
+
+            echo "=== 🔥 Forcer la suppression du nginx-proxy juste avant le run ==="
+            sudo docker rm -f nginx-proxy || true
+            sudo docker rm -f nginx-proxy-le || true
 
             echo "=== 🚀 Démarrage du proxy nginx ==="
             sudo docker run -d \
