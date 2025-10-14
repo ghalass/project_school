@@ -69,10 +69,11 @@ export const AuthContextProvider = ({ children }) => {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
       })
-      console.log(response)
 
       if (response.ok) {
         const data = await response.json()
+
+        console.log(data)
         return data.user || data
       }
       return null
