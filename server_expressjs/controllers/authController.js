@@ -8,7 +8,8 @@ import {
 } from "../utils/functions.js";
 import HttpStatus from "../utils/httpStatus.js";
 import prisma from "../utils/prismaClient.js";
-
+import jwt from "jsonwebtoken";
+// import { sendError } from "../utils/errorResponse.js";
 // Durée d'expiration du token (7h en millisecondes)
 const tokenExpireIn = 7 * 60 * 60 * 1000;
 
@@ -46,4 +47,30 @@ export const loginUser = async (req, res) => {
 export const logoutUser = async (req, res) => {
   clearAuthCookie(res, tokenExpireIn);
   res.status(HttpStatus.OK).json({ message: "Déconnecté avec succès." });
+};
+
+export const get_me = async (req, res) => {
+  const token = req.cookies?.jwt;
+  let decoded;
+  try {
+    decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+  } catch (err) {
+    return res
+      .status(HttpStatus.FORBIDDEN)
+      .json({ error: "Invalid or expired token" });
+  }
+  const userId = Number(decoded?.id);
+  if (!userId)
+    return res
+      .status(HttpStatus.UNAUTHORIZED)
+      .json({ error: "Invalid user ID in token" });
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+  if (!user) {
+    return res
+      .status(HttpStatus.NOT_FOUND)
+      .json({ error: "Utilisateur non trouvé" });
+  }
+  res.status(HttpStatus.OK).json(hidePassword(user));
 };
