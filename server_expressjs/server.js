@@ -55,15 +55,15 @@ app.use(
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
-app.use("/api/", express.static(path.join(__dirname, "public"))); // static files
+app.use("/", express.static(path.join(__dirname, "public"))); // static files
 
 app.use(logger);
 
 // USE ROUTES
-app.use("/api/", rootRoutes);
-app.use("/api/user", userRoutes);
-app.use("/api/auth", authRoutes);
-app.use("/api/dashboard", dashboardRoutes);
+app.use("/", rootRoutes);
+app.use("/user", userRoutes);
+app.use("/auth", authRoutes);
+app.use("/dashboard", dashboardRoutes);
 
 // 404 ROUTE
 app.all("*", (req, res) => {

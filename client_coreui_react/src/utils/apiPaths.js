@@ -1,18 +1,18 @@
-// utilis/apiPaths.js
+// utilisPaths.js
 export const API_PATHS = {
   AUTH: {
-    LOGIN: '/api/auth/login',
-    LOGOUT: '/api/auth/logout',
-    REGISTER: '/api/auth/signup',
-    GET_ALL_USERS: '/api/user/users',
-    GET_CURRENT_USER: '/api/auth/me',
+    LOGIN: '/auth/login',
+    LOGOUT: '/auth/logout',
+    REGISTER: '/auth/signup',
+    GET_ALL_USERS: '/user/users',
+    GET_CURRENT_USER: '/auth/me',
 
-    CHECK_TOKEN: '/api/user/checktoken',
-    UPDATE_USER: '/api/user/updateUser',
-    DELETE_USER: (userId) => `/api/user/${userId}`,
-    GET_USER_INFO: '/api/user/getUserInfo',
+    CHECK_TOKEN: '/user/checktoken',
+    UPDATE_USER: '/user/updateUser',
+    DELETE_USER: (userId) => `/user/${userId}`,
+    GET_USER_INFO: '/user/getUserInfo',
   },
   DASHBOARD: {
-    DASHBOARD: '/api/dashboard',
+    DASHBOARD: '/dashboard',
   },
 }
