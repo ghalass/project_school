@@ -62,17 +62,16 @@ jobs:
             sudo mkdir -p /root/my_school
             cd /root/my_school
 
-            echo "=== 🧹 Nettoyage du système Docker ==="
+            echo "=== 🧹 Nettoyage du système Docker et des proxies existants ==="
             sudo docker stop $(sudo docker ps -q) || true
             sudo docker system prune -af --volumes || true
 
-            echo "=== 🧹 Suppression des anciens proxies nginx ==="
-            if [ "$(sudo docker ps -aq -f name=nginx-proxy)" ]; then
-              sudo docker rm -f nginx-proxy || true
-            fi
-            if [ "$(sudo docker ps -aq -f name=nginx-proxy-le)" ]; then
-              sudo docker rm -f nginx-proxy-le || true
-            fi
+            for c in nginx-proxy nginx-proxy-le; do
+              if [ "$(sudo docker ps -aq -f name=$c)" ]; then
+                echo "➡️ Suppression du conteneur $c..."
+                sudo docker rm -f $c || true
+              fi
+            done
 
             echo "=== 📦 Création du fichier .env ==="
             echo "DATABASE_URL=mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db" > .env
@@ -83,8 +82,7 @@ jobs:
             echo "LETSENCRYPT_EMAIL=msghalas@gmail.com" >> .env
             echo "ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}" >> .env
 
-            echo "=== 🔄 Mise à jour des images ==="
-            sudo docker-compose down || true
+            echo "=== 🔄 Pull des images ==="
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
@@ -128,8 +126,8 @@ jobs:
             fi
 
             if [ ! -d "/etc/letsencrypt/live/school.ghalass.com" ]; then
-              echo "➡️ Génération du certificat initial..."
-              sudo certbot --nginx --non-interactive --agree-tos \
+              echo "➡️ Génération du certificat initial en mode standalone..."
+              sudo certbot certonly --standalone --non-interactive --agree-tos \
                 -m "$CERT_EMAIL" \
                 -d school.ghalass.com -d api.school.ghalass.com || true
             else
@@ -138,6 +136,7 @@ jobs:
             fi
 
             echo "=== 🧱 Lancement des conteneurs d'application ==="
+            sudo docker-compose down || true
             sudo docker-compose up -d
 
             echo "=== ✅ Déploiement terminé avec succès ==="
