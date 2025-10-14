@@ -1,6 +1,6 @@
 export const cookieConfig = () => ({
   httpOnly: true,
-  secure: true,
-  sameSite: "None",
+  secure: process.env.NODE_ENV === "production", // true seulement si HTTPS
+  sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
   path: "/",
 });
