@@ -27,7 +27,7 @@ jobs:
 
       - name: Build frontend image
         run: |
-          echo "VITE_BASE_URL=https://api.school.ghalass.com" > ./client_coreui_react/.env
+          echo "VITE_BASE_URL=https://school.ghalass.com/api" > ./client_coreui_react/.env
           echo "VITE_NODE_ENV=production" >> ./client_coreui_react/.env
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest ./client_coreui_react
 
@@ -47,7 +47,7 @@ jobs:
           source: "docker-compose.yml"
           target: "/root/my_school/"
 
-      # 6️⃣ Déploiement sur le VPS
+      # 6️⃣ Déploiement sur le VPS (avec nettoyage, proxy, certbot)
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -57,86 +57,87 @@ jobs:
           port: 22
           script: |
             set -e
-            echo "=== 🚀 Démarrage du déploiement sur VPS ==="
+            echo "=== 🚀 Déploiement de l'application My School ==="
 
-            mkdir -p /root/my_school
+            sudo mkdir -p /root/my_school
             cd /root/my_school
+
+            echo "=== 🧹 Nettoyage du système Docker ==="
+            sudo docker stop $(sudo docker ps -q) || true
+            sudo docker system prune -af --volumes || true
+
+            echo "=== 🧹 Suppression des anciens proxies nginx ==="
+            if [ "$(sudo docker ps -aq -f name=nginx-proxy)" ]; then
+              sudo docker rm -f nginx-proxy || true
+            fi
+            if [ "$(sudo docker ps -aq -f name=nginx-proxy-le)" ]; then
+              sudo docker rm -f nginx-proxy-le || true
+            fi
 
             echo "=== 📦 Création du fichier .env ==="
             echo "DATABASE_URL=mysql://my_school_user:my_school_pass@db_my_school:3306/my_school_db" > .env
             echo "NODE_ENV=production" >> .env
             echo "PORT=5001" >> .env
-            echo "URL=https://api.school.ghalass.com" >> .env
+            echo "URL=https://school.ghalass.com" >> .env
             echo "TOKEN_EXPIRE_IN=7h" >> .env
-            echo "LETSENCRYPT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}" >> .env
+            echo "LETSENCRYPT_EMAIL=msghalas@gmail.com" >> .env
             echo "ACCESS_TOKEN_SECRET=${{ secrets.BACKEND_ACCESS_TOKEN_SECRET }}" >> .env
 
-            echo "=== 🧹 Nettoyage des anciens conteneurs ==="
-            docker rm -f db_my_school my_school_backend my_school_frontend nginx-proxy nginx-proxy-le 2>/dev/null || true
-
             echo "=== 🔄 Mise à jour des images ==="
-            docker-compose down || true
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
+            sudo docker-compose down || true
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_backend:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/my_school_frontend:latest
 
             echo "=== 🌐 Vérification du réseau nginx-proxy ==="
-            docker network inspect nginx-proxy >/dev/null 2>&1 || docker network create nginx-proxy
+            sudo docker network inspect nginx-proxy >/dev/null 2>&1 || sudo docker network create nginx-proxy
 
             echo "=== 🚀 Démarrage du proxy nginx ==="
-            if [ -z "$(docker ps -q -f name=nginx-proxy)" ]; then
-              docker run -d \
-                --name nginx-proxy \
-                --network nginx-proxy \
-                -p 80:80 -p 443:443 \
-                -v /var/run/docker.sock:/tmp/docker.sock:ro \
-                -v /etc/nginx/certs:/etc/nginx/certs \
-                -v /etc/nginx/vhost.d:/etc/nginx/vhost.d \
-                -v /usr/share/nginx/html:/usr/share/nginx/html \
-                -e FORCE_SSL=true \
-                jwilder/nginx-proxy
-            fi
+            sudo docker run -d \
+              --name nginx-proxy \
+              --network nginx-proxy \
+              -p 80:80 -p 443:443 \
+              -v /var/run/docker.sock:/tmp/docker.sock:ro \
+              -v /etc/nginx/certs:/etc/nginx/certs \
+              -v /etc/nginx/vhost.d \
+              -v /usr/share/nginx/html \
+              -e FORCE_SSL=true \
+              jwilder/nginx-proxy
 
             echo "=== 🔐 Démarrage du companion Let's Encrypt ==="
-            if [ -z "$(docker ps -q -f name=nginx-proxy-le)" ]; then
-              docker run -d \
-                --name nginx-proxy-le \
-                --network nginx-proxy \
-                -v /var/run/docker.sock:/var/run/docker.sock:ro \
-                -v /etc/nginx/certs:/etc/nginx/certs \
-                -v /etc/nginx/vhost.d:/etc/nginx/vhost.d \
-                -v /usr/share/nginx/html:/usr/share/nginx/html \
-                -e DEFAULT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }} \
-                nginxproxy/acme-companion
-            fi
+            sudo docker run -d \
+              --name nginx-proxy-le \
+              --network nginx-proxy \
+              -v /var/run/docker.sock:/var/run/docker.sock:ro \
+              -v /etc/nginx/certs:/etc/nginx/certs \
+              -v /etc/nginx/vhost.d:/etc/nginx/vhost.d \
+              -v /usr/share/nginx/html:/usr/share/nginx/html \
+              -e DEFAULT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }} \
+              nginxproxy/acme-companion
 
             echo "=== 🔧 Installation de Certbot si nécessaire ==="
             if ! command -v certbot >/dev/null 2>&1; then
-              apt-get update -y
-              apt-get install -y certbot python3-certbot-nginx
+              sudo apt-get update -y
+              sudo apt-get install -y certbot python3-certbot-nginx
             fi
 
             echo "=== 🧾 Vérification ou génération du certificat SSL ==="
-            CERT_EMAIL="${{ secrets.LETSENCRYPT_EMAIL }}"
+            CERT_EMAIL=${{ secrets.LETSENCRYPT_EMAIL }}
             if [ -z "$CERT_EMAIL" ]; then
               CERT_EMAIL="admin@ghalass.com"
+              echo "⚠️ Aucun e-mail défini dans GitHub Secrets, utilisation de $CERT_EMAIL"
             fi
 
             if [ ! -d "/etc/letsencrypt/live/school.ghalass.com" ]; then
               echo "➡️ Génération du certificat initial..."
-              certbot --nginx --non-interactive --agree-tos \
+              sudo certbot --nginx --non-interactive --agree-tos \
                 -m "$CERT_EMAIL" \
                 -d school.ghalass.com -d api.school.ghalass.com || true
             else
               echo "➡️ Renouvellement automatique du certificat..."
-              certbot renew --quiet || true
+              sudo certbot renew --quiet || true
             fi
 
-            echo "=== 🧱 Démarrage des conteneurs d'application ==="
-            docker-compose up -d --remove-orphans
-
-            echo "=== 🔁 Forçage redirection HTTP → HTTPS ==="
-            mkdir -p /etc/nginx/vhost.d
-            echo "return 301 https://\$host\$request_uri;" > /etc/nginx/vhost.d/default
-            docker exec nginx-proxy nginx -s reload || true
+            echo "=== 🧱 Lancement des conteneurs d'application ==="
+            sudo docker-compose up -d
 
             echo "=== ✅ Déploiement terminé avec succès ==="
