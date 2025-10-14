@@ -64,7 +64,7 @@ export const AuthContextProvider = ({ children }) => {
 
   const getCurrentUser = async () => {
     try {
-      const response = await fetch('http://localhost:4000/auth/me', {
+      const response = await fetch('/auth/me', {
         method: 'GET',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
