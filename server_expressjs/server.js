@@ -55,7 +55,7 @@ app.use(
     crossOriginResourcePolicy: { policy: "cross-origin" },
   })
 );
-app.use("/", express.static(path.join(__dirname, "public"))); // static files
+app.use("/api/", express.static(path.join(__dirname, "public"))); // static files
 
 app.use(logger);
 

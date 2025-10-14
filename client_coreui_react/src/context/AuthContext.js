@@ -75,7 +75,7 @@ export const AuthContextProvider = ({ children }) => {
       }
       return null
     } catch (error) {
-      console.error('Erreur récupération utilisateur:', error)
+      console.log('Erreur récupération utilisateur:', error)
       return null
     }
   }
