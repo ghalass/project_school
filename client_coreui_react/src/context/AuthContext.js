@@ -1,4 +1,6 @@
 import { createContext, useContext, useEffect, useReducer } from 'react'
+import { apiRequest } from '../utils/apiRequest'
+import { API_PATHS } from '../utils/apiPaths'
 
 // Context
 export const AuthContext = createContext()
@@ -64,23 +66,10 @@ export const AuthContextProvider = ({ children }) => {
 
   const getCurrentUser = async () => {
     try {
-      const response = await fetch('/api/auth/me', {
-        method: 'GET',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-
-        console.log(data)
-        return data.user || data
-      }
+      const response = await apiRequest(API_PATHS.AUTH.GET_CURRENT_USER, 'GET')
+      if (response) return response
       return null
     } catch (error) {
-      console.log(error)
-
-      // console.log('Erreur récupération utilisateur:', error)
       return null
     }
   }
